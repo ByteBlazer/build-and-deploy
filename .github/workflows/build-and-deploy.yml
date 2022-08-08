@@ -2,7 +2,20 @@ name: build-and-deploy-workflow
 
 on:
   workflow_call:
-    
+    inputs:
+      rootDomain:
+        required: true
+        type: string
+      application-name:
+        required: true
+        type: string
+      application-container-port:
+        required: true
+        type: string
+      needsDatabaseInstallation:
+        required: true
+        type: boolean
+
 jobs:
   looper-api-aws-kubernetes-deployment:
     runs-on: ubuntu-22.04
@@ -55,16 +68,16 @@ jobs:
             const nameOfTestNamespace = '${{ secrets.K8S_TEST_NAMESPACE}}';
             const nameOfProductionNamespace = '${{ secrets.K8S_PRODUCTION_NAMESPACE}}';
 
-            let applicationName = 'looper-api'; //TODO: Make this dynamic
+            let applicationName = '${{inputs.application-name}}'; //TODO: Make this dynamic
             let applicationNameForDatabase = 'looper-db'; //TODO: Make this dynamic
-            let dbPodNeedsToBeDeployed = true; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no. 
+            let dbPodNeedsToBeDeployed = ${{inputs.needsDatabaseInstallation}}; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no. 
             let dbSchemaName = 'looper'; //TODO: Make this dynamic
-            let containerPort = '3000'; //TODO: Make this dynamic
+            let containerPort = '${{inputs.application-container-port}}'; //TODO: Make this dynamic
             let containerPortForDatabase = '3306'; //TODO: Make this dynamic
             let servicePort = '80'; //TODO: Make this dynamic
             let servicePortForDatabase = '3306'; //TODO: Make this dynamic
             let pathPattern = '/api/'; //TODO: Make this dynamic
-            let targetRootDomain = 'saleslooper.com'; //TODO: Make this dynamic
+            let targetRootDomain = '${{inputs.rootDomain}}'; //TODO: Make this dynamic
             let numberOfReplicas = 2; //TODO: Make this dynamic
 
             let branchRefToBeCheckedOut = 'NA';
