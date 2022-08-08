@@ -276,7 +276,6 @@ jobs:
 
             return JSON.stringify(resultObj);
 
-
       - name: CodeCheckout
         uses: actions/checkout@v3
         with:
