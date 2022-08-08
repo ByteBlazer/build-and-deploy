@@ -12,6 +12,9 @@ on:
       application-container-port:
         required: true
         type: string
+      numberOfApplicationReplicas:
+        required: true
+        type: number
       needsDatabaseInstallation:
         required: true
         type: boolean
@@ -68,17 +71,21 @@ jobs:
             const nameOfTestNamespace = '${{ secrets.K8S_TEST_NAMESPACE}}';
             const nameOfProductionNamespace = '${{ secrets.K8S_PRODUCTION_NAMESPACE}}';
 
-            let applicationName = '${{inputs.application-name}}'; //TODO: Make this dynamic
-            let applicationNameForDatabase = 'looper-db'; //TODO: Make this dynamic
+            let targetRootDomain = '${{inputs.rootDomain}}'; 
+            let applicationName = '${{inputs.application-name}}';
+            let containerPort = '${{inputs.application-container-port}}';
+            let numberOfReplicas = ${{inputs.numberOfApplicationReplicas}};
             let dbPodNeedsToBeDeployed = ${{inputs.needsDatabaseInstallation}}; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no. 
+
             let dbSchemaName = 'looper'; //TODO: Make this dynamic
-            let containerPort = '${{inputs.application-container-port}}'; //TODO: Make this dynamic
+            let applicationNameForDatabase = 'looper-db'; //TODO: Make this dynamic
+            let pathPattern = '/api/'; //TODO: Make this dynamic
+            
             let containerPortForDatabase = '3306'; //TODO: Make this dynamic
             let servicePort = '80'; //TODO: Make this dynamic
             let servicePortForDatabase = '3306'; //TODO: Make this dynamic
-            let pathPattern = '/api/'; //TODO: Make this dynamic
-            let targetRootDomain = '${{inputs.rootDomain}}'; //TODO: Make this dynamic
-            let numberOfReplicas = 2; //TODO: Make this dynamic
+
+            
 
             let branchRefToBeCheckedOut = 'NA';
             let namespace = 'NA';
