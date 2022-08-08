@@ -15,6 +15,9 @@ on:
       numberOfApplicationReplicas:
         required: true
         type: number
+      path-pattern:
+        required: true
+        type: string
       needsDatabaseInstallation:
         required: true
         type: boolean
@@ -74,18 +77,22 @@ jobs:
             let targetRootDomain = '${{inputs.rootDomain}}'; 
             let applicationName = '${{inputs.application-name}}';
             let containerPort = '${{inputs.application-container-port}}';
+            let pathPattern = '${{inputs.path-pattern}}';
             let numberOfReplicas = ${{inputs.numberOfApplicationReplicas}};
             let dbPodNeedsToBeDeployed = ${{inputs.needsDatabaseInstallation}}; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no. 
 
-            let dbSchemaName = 'looper'; //TODO: Make this dynamic
-            let applicationNameForDatabase = 'looper-db'; //TODO: Make this dynamic
-            let pathPattern = '/api/'; //TODO: Make this dynamic
+            let applicationBaseName = applicationName.split('-')[0];
+            let applicationPostFix = applicationName.split('-')[1];
+            if(!applicationBaseName || !applicationPostFix){
+              throw new Error("The application should have a base name, a hyphen, and a postfix. E.g. looper-api or looper-ui");
+            }
+            
+            let dbSchemaName = applicationBaseName;
+            let applicationNameForDatabase = applicationBaseName + '-' + 'db';
             
             let containerPortForDatabase = '3306'; //TODO: Make this dynamic
             let servicePort = '80'; //TODO: Make this dynamic
             let servicePortForDatabase = '3306'; //TODO: Make this dynamic
-
-            
 
             let branchRefToBeCheckedOut = 'NA';
             let namespace = 'NA';
