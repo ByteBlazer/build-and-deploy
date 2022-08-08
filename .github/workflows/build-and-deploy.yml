@@ -286,7 +286,7 @@ jobs:
           repository: ByteBlazer/build-and-deploy
           path: './yamls'
      # - name: MakeFileCopies 
-     #   run:  cp kubernetes/file.yaml kubernetes/copy-of-file.yaml
+     #   run:  cp kubernetes/file.yaml  kubernetes/copy-of-file.yaml
       - name: ConfigureKubectlCommand
         run: |
           echo 'Configuring kubectl command to talk to EKS cluster inside corporate AWS account.......'
@@ -333,15 +333,15 @@ jobs:
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
           echo "**************************************************************************"
-          cat kubernetes/deployment.yaml
+          cat yamls/kubernetes/deployment.yaml
           echo "**************************************************************************"
-          cat kubernetes/deployment-db.yaml
+          cat yamls/kubernetes/deployment-db.yaml
           echo "**************************************************************************"
-          cat kubernetes/ingress.yaml
+          cat yamls/kubernetes/ingress.yaml
           echo "**************************************************************************"
-          cat kubernetes/service.yaml
+          cat yamls/kubernetes/service.yaml
           echo "**************************************************************************"
-          cat kubernetes/service-db.yaml
+          cat yamls/kubernetes/service-db.yaml
           echo "**************************************************************************"
       #- name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
       #  uses: satackey/action-docker-layer-caching@v0.0.11
@@ -359,9 +359,9 @@ jobs:
       #    echo ".......image push to docker hub completed succesfully"
       - name: DeployToKubernetes
         run: |
-          kubectl apply -f kubernetes/namespace.yaml,kubernetes/deployment.yaml,kubernetes/service.yaml,kubernetes/ingress.yaml
-          kubectl apply -f kubernetes/namespace.yaml,kubernetes/storage.yaml,kubernetes/deployment-db.yaml,kubernetes/service-db.yaml
-          kubectl apply -f kubernetes/deployment.yaml
+          kubectl apply -f yamls/kubernetes/namespace.yaml,yamls/kubernetes/deployment.yaml,yamls/kubernetes/service.yaml,yamls/kubernetes/ingress.yaml
+          kubectl apply -f yamls/kubernetes/namespace.yaml,yamls/kubernetes/storage.yaml,yamls/kubernetes/deployment-db.yaml,yamls/kubernetes/service-db.yaml
+          kubectl apply -f yamls/kubernetes/deployment.yaml
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceName}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}    
       
