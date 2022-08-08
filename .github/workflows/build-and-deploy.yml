@@ -286,7 +286,7 @@ jobs:
         with:
           repository: ByteBlazer/build-and-deploy
           path: './yamls'
-     # - name: MakeFileCopies
+     # - name: MakeFileCopies 
      #   run:  cp kubernetes/file.yaml kubernetes/copy-of-file.yaml
 
       - name: ConfigureKubectlCommand
