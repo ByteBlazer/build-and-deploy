@@ -281,8 +281,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{fromJson(steps.EvaluateParams.outputs.result).branchRefToBeCheckedOut}}
+      - name: CodeCheckout
+        uses: actions/checkout@v3
+        with:
+          repository: ByteBlazer/build-and-deploy
+          path: './yamls'
      # - name: MakeFileCopies
      #   run:  cp kubernetes/file.yaml kubernetes/copy-of-file.yaml
+
       - name: ConfigureKubectlCommand
         run: |
           echo 'Configuring kubectl command to talk to EKS cluster inside corporate AWS account.......'
@@ -294,7 +300,7 @@ jobs:
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
-          files: '["kubernetes/namespace.yaml","kubernetes/deployment.yaml","kubernetes/service.yaml","kubernetes/ingress.yaml"]'
+          files: '["./yamls/kubernetes/namespace.yaml","./yamls/kubernetes/deployment.yaml","./yamls/kubernetes/service.yaml","./yamls/kubernetes/ingress.yaml"]'
         env:
           YAML_NAMESPACE: ${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
           YAML_DEPLOYMENT_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).deploymentName}}
@@ -313,7 +319,7 @@ jobs:
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
-          files: '["kubernetes/namespace.yaml","kubernetes/storage.yaml","kubernetes/deployment-db.yaml","kubernetes/service-db.yaml","kubernetes/ingress-db.yaml"]'
+          files: '["./yamls/kubernetes/namespace.yaml","./yamls/kubernetes/storage.yaml","./yamls/kubernetes/deployment-db.yaml","./yamls/kubernetes/service-db.yaml","./yamls/kubernetes/ingress-db.yaml"]'
         env:
           YAML_NAMESPACE: ${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
           YAML_DEPLOYMENT_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).deploymentNameForDatabase}}
