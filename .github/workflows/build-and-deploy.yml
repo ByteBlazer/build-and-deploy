@@ -288,7 +288,6 @@ jobs:
           path: './yamls'
      # - name: MakeFileCopies 
      #   run:  cp kubernetes/file.yaml kubernetes/copy-of-file.yaml
-
       - name: ConfigureKubectlCommand
         run: |
           echo 'Configuring kubectl command to talk to EKS cluster inside corporate AWS account.......'
