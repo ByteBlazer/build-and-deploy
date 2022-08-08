@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: <<YAML_NAMESPACE>>
+  name: <<YAML_SERVICE_NAME>>
+  annotations:
+    # Traffic Routing
+    service.beta.kubernetes.io/aws-load-balancer-name: <<YAML_SERVICE_NAME>>
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance # specifies the target type to configure for NLB. You can choose between instance and ip
+   
+    # Access Control
+    service.beta.kubernetes.io/load-balancer-source-ranges: 0.0.0.0/0  # specifies the CIDRs that are allowed to access the NLB.
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing" # specifies whether the NLB will be internet-facing or internal
+    external-dns.alpha.kubernetes.io/hostname: db-<<YAML_HOST>>
+    
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: <<YAML_SERVICE_PORT>>, # Specify this annotation if you need both TLS and non-TLS listeners on the same load balancer
+    service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp 
+spec:
+  type: LoadBalancer
+  selector:
+    app: <<YAML_SERVICE_NAME>>
+  ports:
+    - port: <<YAML_SERVICE_PORT>>
+      targetPort: <<YAML_CONTAINER_PORT>>
+---

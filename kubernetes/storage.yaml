@@ -1,0 +1,33 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata: 
+  name: ebs-sc
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer #Provision only after first PVC claim
+parameters:
+  tagSpecification_1: "pvcname={{ .PVCName }}"
+  tagSpecification_2: "pvname={{ .PVName }}"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-mysql-pv-claim-<<YAML_NUMERIC_HASH_OF_HOST_AND_PORT>>
+  namespace: <<YAML_NAMESPACE>>
+spec: 
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc #The name we have for our StorageClass
+  resources: 
+    requests:
+      storage: 1Gi #This is the minimum as per EBS policy
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script
+  namespace: <<YAML_NAMESPACE>>
+data: 
+  init-script.sql: |-
+    CREATE DATABASE IF NOT EXISTS <<YAML_DB_SCHEMA_NAME>>; 
+---

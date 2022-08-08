@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <<YAML_SERVICE_NAME>>
+  namespace: <<YAML_NAMESPACE>>
+spec: 
+  replicas: 1 #Always one
+  selector:
+    matchLabels:
+      app: <<YAML_SERVICE_NAME>>
+  strategy:
+    type: Recreate 
+  template: 
+    metadata: 
+      labels: 
+        app: <<YAML_SERVICE_NAME>>
+    spec: 
+      containers:
+        - name: mysql #TODO
+          image: mysql:5.6
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "<<YAML_HASH_BASED_DB_PASSWORD>>"
+          ports:
+            - containerPort: <<YAML_CONTAINER_PORT>>
+              name: mysql    
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql    
+            - name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes: 
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: ebs-mysql-pv-claim-<<YAML_NUMERIC_HASH_OF_HOST_AND_PORT>>
+        - name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script
+          configMap:
+            name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script
+---

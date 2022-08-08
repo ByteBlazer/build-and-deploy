@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <<YAML_SERVICE_NAME>>
+  namespace: <<YAML_NAMESPACE>>
+spec:
+  replicas: <<YAML_DEPLOYMENT_NUMBER_OF_REPLICAS>>
+  selector:
+    matchLabels:
+      app: <<YAML_SERVICE_NAME>>
+  template:
+    metadata:
+      labels:
+        app: <<YAML_SERVICE_NAME>>
+    spec:
+      containers:
+        - name: <<YAML_CONTAINER_NAME>>
+          image: <<YAML_DOCKER_IMAGE_NAME_AND_TAG>>
+          imagePullPolicy: Always
+          ports:
+            - containerPort: <<YAML_CONTAINER_PORT>>
+---

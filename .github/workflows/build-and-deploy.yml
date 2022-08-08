@@ -1,0 +1,363 @@
+name: build-and-deploy-workflow
+
+on:
+  workflow_call:
+    
+jobs:
+  looper-api-aws-kubernetes-deployment:
+    runs-on: ubuntu-22.04
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    steps:
+      - name: GetAllBranchNames
+        id: GetAllBranchNames
+        run: |
+          gitHubBranchesUrl="$(echo '${{github.event.repository.branches_url}}'|sed 's/{\/branch}//g')";
+          curl --location --request GET $gitHubBranchesUrl --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -o branches.json
+          branches="$(cat branches.json | jq -r '.[].name'|awk '{print $1}' ORS=",")"
+          echo "::set-output name=branches::$branches"
+      - name: EvaluateParams
+        uses: actions/github-script@v6
+        id: EvaluateParams
+        with:
+          result-encoding: string
+          script: |
+
+            //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number less than 1000.
+            const hash = (str) => {
+              let arr = str.split('');
+              let result = arr.reduce(
+                (hashCode, currentVal) =>
+                  (hashCode =
+                    currentVal.charCodeAt(0) +
+                    (hashCode << 6) +
+                    (hashCode << 16) -
+                    hashCode),
+                0,
+              );
+              return Math.abs(result);
+            };
+
+            //Incoming variables
+            const triggeredByAnotherApp =
+              '${{github.event.client_payload.triggeredByAnotherApp}}';
+            const humanTriggered = '${{github.event.client_payload.humanTriggered}}';
+            const featureBranchName = '${{github.event.client_payload.featureBranchName}}';
+            const triggeredBy = '${{github.event.client_payload.triggeredBy}}';
+            const phoneNumberLastFiveDigits =
+              '${{github.event.client_payload.phoneNumberLastFiveDigits}}';
+            const fastForwardServerMilliseconds = //TODO: For future dating of servers, needs to be implemented
+              '${{github.event.client_payload.fastForwardServerMilliseconds}}';
+            const corp = '${{ secrets.CORP }}';
+            const nameOfLightweightNamespace = '${{ secrets.K8S_LIGHTWEIGHT_NAMESPACE}}';
+            const nameOfTestNamespace = '${{ secrets.K8S_TEST_NAMESPACE}}';
+            const nameOfProductionNamespace = '${{ secrets.K8S_PRODUCTION_NAMESPACE}}';
+
+            let applicationName = 'looper-api'; //TODO: Make this dynamic
+            let applicationNameForDatabase = 'looper-db'; //TODO: Make this dynamic
+            let dbPodNeedsToBeDeployed = true; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no. 
+            let dbSchemaName = 'looper'; //TODO: Make this dynamic
+            let containerPort = '3000'; //TODO: Make this dynamic
+            let containerPortForDatabase = '3306'; //TODO: Make this dynamic
+            let servicePort = '80'; //TODO: Make this dynamic
+            let servicePortForDatabase = '3306'; //TODO: Make this dynamic
+            let pathPattern = '/api/'; //TODO: Make this dynamic
+            let targetRootDomain = 'saleslooper.com'; //TODO: Make this dynamic
+            let numberOfReplicas = 2; //TODO: Make this dynamic
+
+            let branchRefToBeCheckedOut = 'NA';
+            let namespace = 'NA';
+            let deploymentName = 'NA';
+            let deploymentNameForDatabase = 'NA';
+            let groupName = 'NA';
+            let containerName = 'NA';
+            let containerNameForDatabase = 'NA';
+            let serviceName = 'NA';
+            let serviceNameForDatabase = 'NA';
+            let numericHashOfHostAndPort = 'NA';
+            let numericHashOfHostAndPortForDatabase = 'NA';
+            let hashBasedDBPassword = 'NA';
+            let ingressLbName = 'NA';
+            let hostName = 'NA';
+            let dockerImageNameAndTag = 'NA';
+
+            containerName = applicationName;
+            containerNameForDatabase = applicationNameForDatabase;
+
+            if (context.eventName == 'repository_dispatch') {
+              console.log('This run is because of a respository_dispatch event');
+
+              namespace = nameOfLightweightNamespace;
+              numberOfReplicas = 1;
+
+              if (
+                //Any one should be true at a time, other should be false. If not, error out.
+                (triggeredByAnotherApp == 'true' && humanTriggered == 'true') ||
+                (triggeredByAnotherApp == 'false' && humanTriggered == 'false')
+              ) {
+                throw new Error(
+                  'Among triggeredByAnotherApp and humanTriggered, any ONE HAS to be true, and the other SHOULD be false.',
+                );
+              }
+
+              if (triggeredByAnotherApp == 'true') {
+                console.log(
+                  'This run is triggered because of another applications feature branch creation process. For e.g. if a feature branch is cut from looper-ui, then looper-api also needs to be deployed in order to complete the stack.',
+                );
+
+                if (!featureBranchName) {
+                  throw new Error(
+                    'If triggeredByAnotherApp, featureBranchName needs to be sent.',
+                  );
+                } else {
+                  console.log(
+                    'Triggered with Feature branch name as: ' + featureBranchName,
+                  );
+                  console.log(
+                    'Branches from GitHub are:${{steps.GetAllBranchNames.outputs.branches}}',
+                  );
+                  const branchArray = '${{steps.GetAllBranchNames.outputs.branches}}'.split(
+                    ',',
+                  );
+                  const matchedBranch = branchArray.find(
+                    (branch) => branch == 'feature/' + featureBranchName,
+                  );
+                  if (matchedBranch) {
+                    console.log('Feature branch Exists: ' + matchedBranch);
+                    branchRefToBeCheckedOut = context.ref;
+                    console.log(
+                      'Setting branchRefToBeCheckedOut to:' + branchRefToBeCheckedOut,
+                    );
+                  } else {
+                    console.log(
+                      'Feature branch DOES NOT Exist. Going to use the code from release branch for deployment.',
+                    );
+                    branchRefToBeCheckedOut = 'refs/heads/release';
+                    console.log(
+                      'Setting branchRefToBeCheckedOut to:' + branchRefToBeCheckedOut,
+                    );
+                  }
+                  groupName = featureBranchName;
+                  hostName = featureBranchName + '.' + targetRootDomain;
+
+                  serviceName = applicationName + '-' + featureBranchName;
+                  serviceNameForDatabase =
+                    applicationNameForDatabase + '-' + featureBranchName;
+
+                  dockerImageNameAndTag =
+                    corp + '/' + applicationName + ':' + featureBranchName;
+                }
+              }
+
+              if (humanTriggered == 'true') {
+                console.log(
+                  'This run has been triggered manually by a user. Going to use the code from release branch for deployment.',
+                );
+                if (!triggeredBy || !phoneNumberLastFiveDigits) {
+                  throw new Error(
+                    'The properties:- triggeredBy and phoneNumberLastFiveDigits must be set',
+                  );
+                }
+                groupName = triggeredBy + '-' + phoneNumberLastFiveDigits;
+                dockerImageNameAndTag =
+                  corp +
+                  '/' +
+                  applicationName +
+                  ':' +
+                  triggeredBy +
+                  '-' +
+                  phoneNumberLastFiveDigits;
+                hostName =
+                  triggeredBy + '-' + phoneNumberLastFiveDigits + '.' + targetRootDomain;
+                serviceName =
+                  applicationName + '-' + triggeredBy + '-' + phoneNumberLastFiveDigits;
+                serviceNameForDatabase =
+                  applicationNameForDatabase +
+                  '-' +
+                  triggeredBy +
+                  '-' +
+                  phoneNumberLastFiveDigits;
+                branchRefToBeCheckedOut = 'refs/heads/release';
+                console.log(
+                  'Setting branchRefToBeCheckedOut to:' + branchRefToBeCheckedOut,
+                );
+              }
+            } else {
+              console.log(
+                'This run is an automated run which got triggered either because of a branch create, or a code commit. Will use the code from incoming branch itself.',
+              );
+
+              branchRefToBeCheckedOut = context.ref;
+              console.log('Setting branchRefToBeCheckedOut to:' + branchRefToBeCheckedOut);
+
+              if (context.ref == 'refs/heads/main') {
+                console.log('The current branch is: main');
+                groupName = applicationName;
+                serviceName = applicationName;
+                serviceNameForDatabase = applicationNameForDatabase;
+                namespace = nameOfProductionNamespace;
+                hostName = targetRootDomain;
+                dockerImageNameAndTag = corp + '/' + applicationName;
+                numberOfReplicas = numberOfReplicas;
+              }
+              if (context.ref == 'refs/heads/release') {
+                console.log('The current branch is: release');
+                groupName = applicationName;
+                serviceName = applicationName;
+                serviceNameForDatabase = applicationNameForDatabase;
+                namespace = nameOfTestNamespace;
+                hostName = 'test' + '.' + targetRootDomain;
+                dockerImageNameAndTag = corp + '/' + applicationName + ':' + 'test';
+                numberOfReplicas = numberOfReplicas;
+              }
+              if (context.ref.startsWith('refs/heads/feature/')) {
+                featureBranchNameExcludingPrefix = context.ref.split(
+                  'refs/heads/feature/',
+                )[1];
+                console.log(
+                  'The current branch is a feature branch. The prefix is feature/ and the name is:' +
+                    featureBranchNameExcludingPrefix,
+                );
+                groupName = featureBranchNameExcludingPrefix;
+
+                serviceName = applicationName + '-' + featureBranchNameExcludingPrefix;
+                serviceNameForDatabase =
+                  applicationNameForDatabase + '-' + featureBranchNameExcludingPrefix;
+
+                hostName = featureBranchNameExcludingPrefix + '.' + targetRootDomain;
+                namespace = nameOfLightweightNamespace;
+                dockerImageNameAndTag =
+                  corp + '/' + applicationName + ':' + featureBranchNameExcludingPrefix;
+                numberOfReplicas = 1;
+
+                console.log(
+                  'Triggering the other applications also in the stack, so that the deployment can work as a whole unit independently',
+                );
+              }
+            }
+
+            numericHashOfHostAndPort = hash(hostName + containerPort) % 1000; //Less than 1000
+            numericHashOfHostAndPortForDatabase =
+              hash(hostName + containerPortForDatabase) % 1000; //Less than 1000
+
+            deploymentName = applicationName + '-' + groupName;
+            deploymentNameForDatabase = applicationNameForDatabase + '-' + groupName;
+
+            ingressLbName = 'ingress-lb' + '-' + namespace;
+            hashBasedDBPassword = hash(hostName) % 100000; //5 digit
+
+            const resultObj = {
+              branchRefToBeCheckedOut,
+              namespace,
+              deploymentName,
+              deploymentNameForDatabase,
+              numberOfReplicas,
+              containerName,
+              containerNameForDatabase,
+              containerPort,
+              containerPortForDatabase,
+              serviceName,
+              serviceNameForDatabase,
+              servicePort,
+              servicePortForDatabase,
+              numericHashOfHostAndPort,
+              numericHashOfHostAndPortForDatabase,
+              ingressLbName,
+              hostName,
+              pathPattern,
+              dockerImageNameAndTag,
+              dbSchemaName,
+              hashBasedDBPassword,
+            };
+
+            console.log('Result Object:' + JSON.stringify(resultObj));
+
+            return JSON.stringify(resultObj);
+
+
+      - name: CodeCheckout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{fromJson(steps.EvaluateParams.outputs.result).branchRefToBeCheckedOut}}
+     # - name: MakeFileCopies
+     #   run:  cp kubernetes/file.yaml kubernetes/copy-of-file.yaml
+      - name: ConfigureKubectlCommand
+        run: |
+          echo 'Configuring kubectl command to talk to EKS cluster inside corporate AWS account.......'
+          aws eks --region ${{ secrets.AWS_DEFAULT_REGION }} update-kubeconfig --name ${{ secrets.AWS_EKS_CLUSTER_NAME }}
+          echo '....configuration of kubectl command completed'
+          kubectl get pods
+      - name: ReplaceTokensInKubernetesDeploymentFiles
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: "<<"
+          tokenSuffix: ">>"
+          files: '["kubernetes/namespace.yaml","kubernetes/deployment.yaml","kubernetes/service.yaml","kubernetes/ingress.yaml"]'
+        env:
+          YAML_NAMESPACE: ${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
+          YAML_DEPLOYMENT_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).deploymentName}}
+          YAML_DEPLOYMENT_NUMBER_OF_REPLICAS: ${{fromJson(steps.EvaluateParams.outputs.result).numberOfReplicas}}
+          YAML_CONTAINER_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).containerName}}
+          YAML_CONTAINER_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).containerPort}}
+          YAML_SERVICE_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).serviceName}}
+          YAML_SERVICE_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).servicePort}}
+          YAML_NUMERIC_HASH_OF_HOST_AND_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).numericHashOfHostAndPort}}
+          YAML_INGRESS_LB_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).ingressLbName}}
+          YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
+          YAML_PATH_PATTERN: ${{fromJson(steps.EvaluateParams.outputs.result).pathPattern}}
+          YAML_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}}
+      - name: ReplaceTokensInKubernetesDatabaseDeploymentFiles
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: "<<"
+          tokenSuffix: ">>"
+          files: '["kubernetes/namespace.yaml","kubernetes/storage.yaml","kubernetes/deployment-db.yaml","kubernetes/service-db.yaml","kubernetes/ingress-db.yaml"]'
+        env:
+          YAML_NAMESPACE: ${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
+          YAML_DEPLOYMENT_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).deploymentNameForDatabase}}
+          YAML_CONTAINER_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).containerNameForDatabase}}
+          YAML_CONTAINER_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).containerPortForDatabase}}
+          YAML_SERVICE_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}}
+          YAML_SERVICE_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).servicePortForDatabase}}
+          YAML_NUMERIC_HASH_OF_HOST_AND_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).numericHashOfHostAndPortForDatabase}}
+          YAML_INGRESS_LB_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).ingressLbName}}
+          YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
+          YAML_DB_SCHEMA_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).dbSchemaName}}
+          YAML_HASH_BASED_DB_PASSWORD: ${{fromJson(steps.EvaluateParams.outputs.result).hashBasedDBPassword}}
+      - name: DEBUG-ViewReplacedK8sYaml
+        run: |
+          echo "**************************************************************************"
+          cat kubernetes/deployment.yaml
+          echo "**************************************************************************"
+          cat kubernetes/deployment-db.yaml
+          echo "**************************************************************************"
+          cat kubernetes/ingress.yaml
+          echo "**************************************************************************"
+          cat kubernetes/service.yaml
+          echo "**************************************************************************"
+          cat kubernetes/service-db.yaml
+          echo "**************************************************************************"
+      #- name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
+      #  uses: satackey/action-docker-layer-caching@v0.0.11
+      #  continue-on-error: true
+      #- name: BuildAndPushDockerImage
+      #  run: |
+      #    echo "Going to login to Docker Hub....."
+      #    echo "${{ secrets.DOCKER_LOGIN_PASSWORD}}"|docker login --username ${{ secrets.DOCKER_LOGIN_USER}} --password-stdin 
+      #    echo ".......Logged in successfully to Docker  Hub"
+      #    echo "Going to build the docker image......."
+      #    docker build -t ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} . --quiet
+      #    echo ".......docker image built succesfully"
+      #    echo "Going to push the docker image to docker hub......."
+      #    docker push ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} --quiet
+      #    echo ".......image push to docker hub completed succesfully"
+      - name: DeployToKubernetes
+        run: |
+          kubectl apply -f kubernetes/namespace.yaml,kubernetes/deployment.yaml,kubernetes/service.yaml,kubernetes/ingress.yaml
+          kubectl apply -f kubernetes/namespace.yaml,kubernetes/storage.yaml,kubernetes/deployment-db.yaml,kubernetes/service-db.yaml
+          kubectl apply -f kubernetes/deployment.yaml
+          kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceName}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
+          kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}    
+      
