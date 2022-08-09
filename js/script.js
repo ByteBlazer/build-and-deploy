@@ -1,4 +1,4 @@
-module.exports = ({ github, context, branches, keyValuePairsJsonString }) => {
+module.exports = ({ github, context, branches, keyValuePairsJsonString, targetRootDomain,applicationName,containerPort,pathPattern,numberOfApplicationReplicas,needsDatabaseInstallation }) => {
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
     let arr = str.split("");
@@ -31,12 +31,12 @@ module.exports = ({ github, context, branches, keyValuePairsJsonString }) => {
   const nameOfProductionNamespace = "${{ secrets.K8S_PRODUCTION_NAMESPACE}}";
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
 
-  let targetRootDomain = "${{inputs.rootDomain}}";
-  let applicationName = "${{inputs.application-name}}";
-  let containerPort = "${{inputs.application-container-port}}";
-  let pathPattern = "${{inputs.path-pattern}}";
-  let numberOfReplicas = +"${{inputs.numberOfApplicationReplicas}}";
-  let dbPodNeedsToBeDeployed = "${{inputs.needsDatabaseInstallation}}"; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no.
+  let targetRootDomain = targetRootDomain;
+  let applicationName = applicationName;
+  let containerPort = containerPort;
+  let pathPattern = pathPattern;
+  let numberOfReplicas = numberOfApplicationReplicas;
+  let dbPodNeedsToBeDeployed = needsDatabaseInstallation; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no.
 
   let applicationBaseName = applicationName.split("-")[0];
   let applicationPostFix = applicationName.split("-")[1];

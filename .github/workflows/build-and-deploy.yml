@@ -3,19 +3,19 @@ name: build-and-deploy-workflow
 on:
   workflow_call:
     inputs:
-      rootDomain:
+      targetRootDomain:
         required: true
         type: string
-      application-name:
+      applicationName:
         required: true
         type: string
-      application-container-port:
+      containerPort:
         required: true
         type: string
       numberOfApplicationReplicas:
         required: true
         type: number
-      path-pattern:
+      pathPattern:
         required: true
         type: string
       needsDatabaseInstallation:
@@ -59,7 +59,7 @@ jobs:
           result-encoding: string
           script: |
             const script = require('./build-and-deloy-repo/js/script.js');
-            return script({ github, context, branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}' });
+            return script({ github, context, branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabaseInstallation:'${{inputs.targetRootDomain}}'});
       - name: CodeCheckout
         uses: actions/checkout@v3
         with:
