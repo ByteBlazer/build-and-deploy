@@ -47,13 +47,7 @@ jobs:
             //TODO: Delete snippet after use
             console.log('${{github}}');
             console.log('${{secrets}}');
-            cat secrets.txt
-            console.log('cat done.')
-            console.log("Raw secrets:"+JSON.stringify(${{ secrets }}));
-            let secretsArray = JSON.parse('${{secrets}}');
-            console.log("The secrets Array object is:"+secretsArray);
-            console.log("The length of secrets Array object is:"+secretsArray.length);
-
+            
             //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number less than 1000.
             const hash = (str) => {
               let arr = str.split('');
