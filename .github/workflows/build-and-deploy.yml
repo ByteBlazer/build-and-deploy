@@ -45,6 +45,9 @@ jobs:
           script: |
 
             //TODO: Delete snippet after use
+            echo '${{ secrets }}' > secrets.txt
+            cat secrets.txt
+            console.log('cat done.')
             console.log("Raw secrets:"+JSON.stringify(${{ secrets }}));
             let secretsArray = JSON.parse('${{secrets}}');
             console.log("The secrets Array object is:"+secretsArray);
