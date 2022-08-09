@@ -45,8 +45,8 @@ jobs:
           script: |
 
             //TODO: Delete snippet after use
-            console.log(${{github}});
-            console.log(${{secrets}});
+            console.log(JSON.stringify(${{github}}));
+            console.log(JSON.stringify(${{secrets}}));
             
             //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number less than 1000.
             const hash = (str) => {
