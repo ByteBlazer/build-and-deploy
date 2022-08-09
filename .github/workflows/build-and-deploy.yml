@@ -59,7 +59,7 @@ jobs:
           result-encoding: string
           script: |
             const script = require('./build-and-deloy-repo/js/script.js');
-            return script({ github, context, "","" });
+            return script({ github, context, a:"",b:"" });
       - name: CodeCheckout
         uses: actions/checkout@v3
         with:
