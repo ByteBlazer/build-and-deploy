@@ -439,6 +439,7 @@ jobs:
           dockerBuildCommandFirstPart="docker build -t ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} . --quiet"
           dockerBuildCommandSecondPart="${{fromJson(steps.EvaluateParams.outputs.result).buildArgsCommandLineArgsForDockerBuild}}"
           dockerBuildCommand=$dockerBuildCommandFirstPart$dockerBuildCommandSecondPart
+          echo "Docker Build Final Command:$dockerBuildCommand"
           eval $dockerBuildCommand
           echo ".......docker image built succesfully"
           echo "Going to push the docker image to docker hub......."
