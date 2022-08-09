@@ -1,4 +1,4 @@
-module.exports = ({ github, context, branches, keyValuePairsJsonString, targetRootDomain,applicationName,containerPort,pathPattern,numberOfApplicationReplicas,needsDatabaseInstallation }) => {
+module.exports = ({ github, context, secrets, branches, keyValuePairsJsonString, targetRootDomain,applicationName,containerPort,pathPattern,numberOfApplicationReplicas,needsDatabaseInstallation }) => {
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
     let arr = str.split("");
