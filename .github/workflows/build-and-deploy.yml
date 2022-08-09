@@ -39,7 +39,9 @@ jobs:
           echo "::set-output name=branches::$branches"
       - name: view the secrets context
         shell: bash
-        run: echo "$SECRETS_CONTEXT"
+        id: ViewSecretKeys
+        run: |
+          echo "::set-output name=secretKeysList::$SECRETS_CONTEXT"
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
       - name: EvaluateParams
@@ -48,6 +50,8 @@ jobs:
         with:
           result-encoding: string
           script: |
+
+            console.log(${{steps.ViewSecretKeys.outputs.secretKeysList}})
 
             //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number less than 1000.
             const hash = (str) => {
