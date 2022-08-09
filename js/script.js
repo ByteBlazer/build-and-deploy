@@ -26,7 +26,7 @@ module.exports = ({ github, context, secrets, branches, keyValuePairsJsonString,
   const fastForwardServerMilliseconds = //TODO: For future dating of servers, needs to be implemented
     "${{github.event.client_payload.fastForwardServerMilliseconds}}";
   const corp = "${{ secrets.CORP }}";
-  const nameOfLightweightNamespace = "${{ secrets.K8S_LIGHTWEIGHT_NAMESPACE}}";
+  const nameOfLightweightNamespace = secrets.K8S_LIGHTWEIGHT_NAMESPACE;
   const nameOfTestNamespace = "${{ secrets.K8S_TEST_NAMESPACE}}";
   const nameOfProductionNamespace = "${{ secrets.K8S_PRODUCTION_NAMESPACE}}";
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
