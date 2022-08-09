@@ -57,7 +57,7 @@ jobs:
             const keysArray = '${{steps.ViewSecretKeys.outputs.secretKeys}}'.split(",");
             const dockerEnvKeysArray = keysArray.filter(key=>key.startsWith('DOCKER_ENV_'));
             console.log('Docker array key length:'+dockerEnvKeysArray.length);
-            dockerEnvKeysArray.forEach(key=>console.log('They key is:'+key+' and the value is:'+'${{secrets[key]}}'));
+            dockerEnvKeysArray.forEach(key=>console.log('They key is:'+key+' and the value is:'+ ${{secrets[key]}}));
 
             //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number less than 1000.
             const hash = (str) => {
