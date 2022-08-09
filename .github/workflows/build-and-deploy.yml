@@ -130,7 +130,7 @@ jobs:
             const envNameForLightWeight = 'LIGHTWEIGHT';
 
             const dockerEnvBaseVarKeyNameForDBHost = 'DB_HOST';
-            const dockerEnvBaseVarKeyNameForDBUserame = 'DB_USERNAME';
+            const dockerEnvBaseVarKeyNameForDBUsername = 'DB_USERNAME';
             const dockerEnvBaseVarKeyNameForDBPassword = 'DB_PASSWORD';
             const baseVarKeyNameForDBShowSql = 'DB_SHOWSQL';
             const baseVarKeyNameForDBSchema = 'DB_SCHEMA'
