@@ -42,8 +42,7 @@ jobs:
         id: ViewSecretKeys
         run: |
           echo "$SECRETS_CONTEXT">secretKeys.json
-          secretKeys="$(cat secretKeys.json)"
-          cat secretKeys.json
+          secretKeys="$(cat secretKeys.json | jq -r '.[]' | awk '{print $1}' ORS=",")"
           echo "::set-output name=secretKeys::$secretKeys"
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
