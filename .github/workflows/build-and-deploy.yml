@@ -321,7 +321,7 @@ jobs:
 
             console.log('Length of Docker env variables list to be applied to docker build:'+envKeyPairsForDockerBuild.length);
 
-            const buildArgsCommandLineArgsForDockerBuild = '';
+            let buildArgsCommandLineArgsForDockerBuild = '';
 
             for(key in envKeyPairsForDockerBuild){
               buildArgsCommandLineArgsForDockerBuild = buildArgsCommandLineArgsForDockerBuild + ' --build-arg ' + ' '+key+' '+envKeyPairsForDockerBuild[key];
