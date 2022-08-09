@@ -322,9 +322,10 @@ jobs:
             console.log('Length of Docker env variables list to be applied to docker build:'+envKeyPairsForDockerBuild.length);
 
             let buildArgsCommandLineArgsForDockerBuild = '';
+
             for(element in envKeyPairsForDockerBuild){
-              console.log('Element:'+envKeyPairsForDockerBuild[element]);
-              const {k as key,v as value} = envKeyPairsForDockerBuild[element];
+              const key = envKeyPairsForDockerBuild[element].keys()[0];
+              const value = envKeyPairsForDockerBuild[element].values()[0];
               buildArgsCommandLineArgsForDockerBuild = buildArgsCommandLineArgsForDockerBuild + ' --build-arg ' + ' '+key+' '+value;
             }
             console.log('Build args segment for Docker build command:'+buildArgsCommandLineArgsForDockerBuild);
