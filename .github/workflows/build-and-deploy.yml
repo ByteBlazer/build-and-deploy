@@ -45,7 +45,7 @@ jobs:
           script: |
 
             //TODO: Delete snippet after use
-            echo '${{ context }}' > secrets.txt
+            echo '${{ github }}' > secrets.txt
             cat secrets.txt
             console.log('cat done.')
             console.log("Raw secrets:"+JSON.stringify(${{ secrets }}));
