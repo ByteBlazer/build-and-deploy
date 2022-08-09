@@ -66,6 +66,11 @@ jobs:
           ref: ${{fromJson(steps.EvaluateParams.outputs.result).branchRefToBeCheckedOut}}
       # - name: MakeFileCopies
       #   run:  cp kubernetes/file.yaml  kubernetes/copy-of-file.yaml
+      - name: CodeCheckout
+        uses: actions/checkout@v3
+        with:
+          repository: ByteBlazer/build-and-deploy
+          path: "./build-and-deloy-repo"
       - name: ConfigureKubectlCommand
         run: |
           echo 'Configuring kubectl command to talk to EKS cluster inside corporate AWS account.......'
@@ -109,11 +114,6 @@ jobs:
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_DB_SCHEMA_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).dbSchemaName}}
           YAML_HASH_BASED_DB_PASSWORD: ${{fromJson(steps.EvaluateParams.outputs.result).hashBasedDBPassword}}
-      - name: CodeCheckout
-        uses: actions/checkout@v3
-        with:
-          repository: ByteBlazer/build-and-deploy
-          path: "./build-and-deloy-repo"
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
           pwd
