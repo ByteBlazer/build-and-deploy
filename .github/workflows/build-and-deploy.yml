@@ -315,7 +315,7 @@ jobs:
               if(key.startsWith(dockerEnvVarPrefix+'_'+dockerPhraseForCommonEnvVariables)){
                 const value = keyValuePairsJsonObj[key];
                 const strippedKey = key.replace(dockerEnvVarPrefix+'_'+dockerPhraseForCommonEnvVariables+'_','');
-                envKeyPairsForDockerBuild.push({strippedKey:value});
+                envKeyPairsForDockerBuild.push({key:strippedKey,value:value});
               }
             }
 
@@ -325,8 +325,7 @@ jobs:
 
             for(element in envKeyPairsForDockerBuild){
 
-              const key = Object.keys(envKeyPairsForDockerBuild[element])[0];
-              const value = Object.values(envKeyPairsForDockerBuild[element])[0];
+              const {key,value} = envKeyPairsForDockerBuild[element];
               buildArgsCommandLineArgsForDockerBuild = buildArgsCommandLineArgsForDockerBuild + ' --build-arg ' + ' '+key+' '+value;
             }
             console.log('Build args segment for Docker build command:'+buildArgsCommandLineArgsForDockerBuild);
