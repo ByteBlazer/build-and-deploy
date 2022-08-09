@@ -37,6 +37,11 @@ jobs:
           curl --location --request GET $gitHubBranchesUrl --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -o branches.json
           branches="$(cat branches.json | jq -r '.[].name'|awk '{print $1}' ORS=",")"
           echo "::set-output name=branches::$branches"
+      - name: view the secrets context
+        shell: bash
+        run: echo "$SECRETS_CONTEXT"
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
       - name: EvaluateParams
         uses: actions/github-script@v6
         id: EvaluateParams
@@ -44,9 +49,6 @@ jobs:
           result-encoding: string
           script: |
 
-            //TODO: Delete snippet after use
-            console.log($SECRETS_CONTEXT);
-                        
             //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number less than 1000.
             const hash = (str) => {
               let arr = str.split('');
