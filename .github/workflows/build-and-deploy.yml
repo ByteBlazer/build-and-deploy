@@ -328,8 +328,8 @@ jobs:
 
             
             if(env == envNameForLightWeight){
-                envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBHost ,value:"########"});
-                envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBUsername ,value:"########"});
+                envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBHost ,value:"db-"+hostName});
+                envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBUsername ,value:"root"});
                 envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBPassword ,value:hashBasedDBPassword});
                 envKeyPairsForDockerBuild.push({key: baseVarKeyNameForDBShowSql ,value:true});
                 baseVarKeyNameForDBShowSql
