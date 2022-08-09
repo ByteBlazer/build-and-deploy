@@ -43,6 +43,7 @@ jobs:
         run: |
           echo "$SECRETS_CONTEXT">secretKeys.json
           secretKeys="$(cat secretKeys.json)"
+          cat secretKeys.json
           echo "::set-output name=secretKeys::$secretKeys"
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
