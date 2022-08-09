@@ -129,6 +129,11 @@ jobs:
             const envNameForTest = 'TEST';
             const envNameForLightWeight = 'LIGHTWEIGHT';
 
+            const dockerEnvBaseVarKeyNameForDBHost = 'DB_HOST';
+            const dockerEnvBaseVarKeyNameForDBUserame = 'DB_USERNAME';
+            const dockerEnvBaseVarKeyNameForDBPassword = 'DB_PASSWORD';
+            const baseVarKeyNameForDBSchema = 'DB_SCHEMA'
+
             containerName = applicationName;
             containerNameForDatabase = applicationNameForDatabase;
 
@@ -319,6 +324,15 @@ jobs:
               }
             }
 
+            
+            if(env == envNameForLightWeight){
+                envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBHost ,value:"########"});
+                envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBUsername ,value:"########"});
+                envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBPassword ,value:hashBasedDBPassword});
+            }
+
+            envKeyPairsForDockerBuild.push({key: baseVarKeyNameForDBSchema ,value:dbSchemaName});
+
             console.log('Length of Docker env variables list to be applied to docker build:'+envKeyPairsForDockerBuild.length);
 
             let buildArgsCommandLineArgsForDockerBuild = '';
@@ -328,6 +342,7 @@ jobs:
               const {key,value} = element;
               buildArgsCommandLineArgsForDockerBuild = buildArgsCommandLineArgsForDockerBuild + ' --build-arg ' + ' '+key+'='+value;
             }
+
             console.log('Build args segment for Docker build command:'+buildArgsCommandLineArgsForDockerBuild);
             
 
