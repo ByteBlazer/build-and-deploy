@@ -53,7 +53,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const script = require("../js/script.js");
+            const script = require("./js/script.js");
             script({ github, context });
       - name: CodeCheckout
         uses: actions/checkout@v3
