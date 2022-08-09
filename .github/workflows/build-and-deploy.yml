@@ -310,7 +310,7 @@ jobs:
               if(key.startsWith(dockerEnvVarPrefix+'_'+env)){
                 const value = keyValuePairsJsonObj[key];
                 const strippedKey = key.replace(dockerEnvVarPrefix+'_'+env+'_','');
-                envKeyPairsForDockerBuild.push({strippedKey:value});
+                envKeyPairsForDockerBuild.push({key:strippedKey,value:value});
               }
               if(key.startsWith(dockerEnvVarPrefix+'_'+dockerPhraseForCommonEnvVariables)){
                 const value = keyValuePairsJsonObj[key];
