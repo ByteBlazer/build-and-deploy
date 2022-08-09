@@ -132,7 +132,9 @@ jobs:
             const dockerEnvBaseVarKeyNameForDBHost = 'DB_HOST';
             const dockerEnvBaseVarKeyNameForDBUserame = 'DB_USERNAME';
             const dockerEnvBaseVarKeyNameForDBPassword = 'DB_PASSWORD';
+            const baseVarKeyNameForDBShowSql = 'DB_SHOWSQL';
             const baseVarKeyNameForDBSchema = 'DB_SCHEMA'
+
 
             containerName = applicationName;
             containerNameForDatabase = applicationNameForDatabase;
@@ -329,6 +331,10 @@ jobs:
                 envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBHost ,value:"########"});
                 envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBUsername ,value:"########"});
                 envKeyPairsForDockerBuild.push({key: dockerEnvBaseVarKeyNameForDBPassword ,value:hashBasedDBPassword});
+                envKeyPairsForDockerBuild.push({key: baseVarKeyNameForDBShowSql ,value:true});
+                baseVarKeyNameForDBShowSql
+            }else{
+                envKeyPairsForDockerBuild.push({key: baseVarKeyNameForDBShowSql ,value:false});
             }
 
             envKeyPairsForDockerBuild.push({key: baseVarKeyNameForDBSchema ,value:dbSchemaName});
