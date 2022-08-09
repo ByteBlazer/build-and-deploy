@@ -1,4 +1,19 @@
-module.exports = ({ github, context, secrets, branches, keyValuePairsJsonString, targetRootDomain,applicationName,containerPort,pathPattern,numberOfApplicationReplicas,needsDatabaseInstallation }) => {
+module.exports = ({
+  github,
+  context,
+  corp,
+  nameOfLightweightNamespace,
+  nameOfTestNamespace,
+  nameOfProductionNamespace,
+  branches,
+  keyValuePairsJsonString,
+  targetRootDomain,
+  applicationName,
+  containerPort,
+  pathPattern,
+  numberOfApplicationReplicas,
+  needsDatabaseInstallation,
+}) => {
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
     let arr = str.split("");
@@ -25,10 +40,7 @@ module.exports = ({ github, context, secrets, branches, keyValuePairsJsonString,
     "${{github.event.client_payload.phoneNumberLastFiveDigits}}";
   const fastForwardServerMilliseconds = //TODO: For future dating of servers, needs to be implemented
     "${{github.event.client_payload.fastForwardServerMilliseconds}}";
-  const corp = "${{ secrets.CORP }}";
-  const nameOfLightweightNamespace = secrets.K8S_LIGHTWEIGHT_NAMESPACE;
-  const nameOfTestNamespace = "${{ secrets.K8S_TEST_NAMESPACE}}";
-  const nameOfProductionNamespace = "${{ secrets.K8S_PRODUCTION_NAMESPACE}}";
+
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
 
   let numberOfReplicas = numberOfApplicationReplicas;
