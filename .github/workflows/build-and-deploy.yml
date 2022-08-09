@@ -41,19 +41,19 @@ jobs:
         shell: bash
         id: ViewSecretKeys
         run: |
-          echo "::set-output name=secretKeysList::$SECRETS_CONTEXT"
+          echo "$SECRETS_CONTEXT">secretKeys.json
+          secretKeys="$(cat secretKeys.json)"
+          echo "::set-output name=secretKeys::$secretKeys"
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
       - name: EvaluateParams
         uses: actions/github-script@v6
         id: EvaluateParams
-        env:
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
         with:
           result-encoding: string
           script: |
 
-            console.log('The list of secret keys ' + '$SECRETS_CONTEXT');
+            console.log('The list of secret keys ' + '${{steps.ViewSecretKeys.outputs.secretKeys}}');
 
             //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number less than 1000.
             const hash = (str) => {
