@@ -112,15 +112,15 @@ jobs:
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
           echo "**************************************************************************"
-          cat yamls/kubernetes/deployment.yaml
+          cat build-and-deloy-repo/kubernetes/deployment.yaml
           echo "**************************************************************************"
-          cat yamls/kubernetes/deployment-db.yaml
+          cat build-and-deloy-repo/kubernetes/deployment-db.yaml
           echo "**************************************************************************"
-          cat yamls/kubernetes/ingress.yaml
+          cat build-and-deloy-repo/kubernetes/ingress.yaml
           echo "**************************************************************************"
-          cat yamls/kubernetes/service.yaml
+          cat build-and-deloy-repo/kubernetes/service.yaml
           echo "**************************************************************************"
-          cat yamls/kubernetes/service-db.yaml
+          cat build-and-deloy-repo/kubernetes/service-db.yaml
           echo "**************************************************************************"
       - name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
         uses: satackey/action-docker-layer-caching@v0.0.11
