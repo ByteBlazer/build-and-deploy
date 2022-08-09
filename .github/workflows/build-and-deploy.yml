@@ -323,8 +323,8 @@ jobs:
 
             let buildArgsCommandLineArgsForDockerBuild = '';
 
-            for(element in envKeyPairsForDockerBuild){
-
+            for(element of envKeyPairsForDockerBuild){
+              console.log(element);
               const {key,value} = element;
               buildArgsCommandLineArgsForDockerBuild = buildArgsCommandLineArgsForDockerBuild + ' --build-arg ' + ' '+key+' '+value;
             }
