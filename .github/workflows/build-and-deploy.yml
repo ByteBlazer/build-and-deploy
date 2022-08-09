@@ -166,8 +166,8 @@ jobs:
           echo ".......image push to docker hub completed succesfully"
       - name: DeployToKubernetes
         run: |
-          kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
-          kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
-          kubectl apply -f build-and-deloy-repo/kubernetes/deployment.yaml
+          kubectl apply -f yamls/kubernetes/namespace.yaml,yamls/kubernetes/deployment.yaml,yamls/kubernetes/service.yaml,yamls/kubernetes/ingress.yaml
+          kubectl apply -f yamls/kubernetes/namespace.yaml,yamls/kubernetes/storage.yaml,yamls/kubernetes/deployment-db.yaml,yamls/kubernetes/service-db.yaml
+          kubectl apply -f yamls/kubernetes/deployment.yaml
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceName}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
