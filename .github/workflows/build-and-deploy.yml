@@ -51,7 +51,7 @@ jobs:
           result-encoding: string
           script: |
 
-            console.log('${{steps.ViewSecretKeys.outputs.secretKeysList}}'');
+            console.log('${{steps.ViewSecretKeys.outputs.secretKeysList}}');
 
             //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number less than 1000.
             const hash = (str) => {
