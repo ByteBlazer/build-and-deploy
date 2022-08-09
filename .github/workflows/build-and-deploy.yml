@@ -111,6 +111,8 @@ jobs:
           YAML_HASH_BASED_DB_PASSWORD: ${{fromJson(steps.EvaluateParams.outputs.result).hashBasedDBPassword}}
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
+          pwd
+          ls -ltr
           echo "**************************************************************************"
           cat ./build-and-deloy-repo/kubernetes/deployment.yaml
           echo "**************************************************************************"
