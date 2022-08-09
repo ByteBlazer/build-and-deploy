@@ -353,7 +353,7 @@ jobs:
               dockerImageNameAndTag,
               dbSchemaName,
               hashBasedDBPassword,
-              envKeyPairsForDockerBuild
+              buildArgsCommandLineArgsForDockerBuild
             };
 
             console.log('Result Object:' + JSON.stringify(resultObj));
@@ -436,7 +436,8 @@ jobs:
           echo "${{ secrets.DOCKER_LOGIN_PASSWORD}}"|docker login --username ${{ secrets.DOCKER_LOGIN_USER}} --password-stdin 
           echo ".......Logged in successfully to Docker  Hub"
           echo "Going to build the docker image......."
-          docker build -t ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} . --quiet
+          dockerBuildCommand = "docker build -t ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} . --quiet" + "${{fromJson(steps.EvaluateParams.outputs.result).buildArgsCommandLineArgsForDockerBuild}}"
+          eval dockerBuildCommand
           echo ".......docker image built succesfully"
           echo "Going to push the docker image to docker hub......."
           docker push ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} --quiet
