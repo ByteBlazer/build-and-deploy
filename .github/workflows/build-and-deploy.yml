@@ -326,7 +326,7 @@ jobs:
             for(element of envKeyPairsForDockerBuild){
               console.log(element);
               const {key,value} = element;
-              buildArgsCommandLineArgsForDockerBuild = buildArgsCommandLineArgsForDockerBuild + ' --build-arg ' + ' '+key+' '+value;
+              buildArgsCommandLineArgsForDockerBuild = buildArgsCommandLineArgsForDockerBuild + ' --build-arg ' + ' '+key+'='+value;
             }
             console.log('Build args segment for Docker build command:'+buildArgsCommandLineArgsForDockerBuild);
             
