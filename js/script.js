@@ -31,10 +31,6 @@ module.exports = ({ github, context, branches, keyValuePairsJsonString, targetRo
   const nameOfProductionNamespace = "${{ secrets.K8S_PRODUCTION_NAMESPACE}}";
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
 
-  let targetRootDomain = targetRootDomain;
-  let applicationName = applicationName;
-  let containerPort = containerPort;
-  let pathPattern = pathPattern;
   let numberOfReplicas = numberOfApplicationReplicas;
   let dbPodNeedsToBeDeployed = needsDatabaseInstallation; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no.
 
