@@ -1,4 +1,4 @@
-module.exports = ({ github, context }) => {
+module.exports = ({ github, context, branches, keyValuePairsJsonString }) => {
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
     let arr = str.split("");
@@ -113,11 +113,8 @@ module.exports = ({ github, context }) => {
         console.log(
           "Triggered with Feature branch name as: " + featureBranchName
         );
-        console.log(
-          "Branches from GitHub are:${{steps.GetAllBranchNames.outputs.branches}}"
-        );
-        const branchArray =
-          "${{steps.GetAllBranchNames.outputs.branches}}".split(",");
+        console.log("Branches from GitHub are:" + branches);
+        const branchArray = branches.split(",");
         const matchedBranch = branchArray.find(
           (branch) => branch == "feature/" + featureBranchName
         );
@@ -253,13 +250,8 @@ module.exports = ({ github, context }) => {
   ingressLbName = "ingress-lb" + "-" + namespace;
   hashBasedDBPassword = hash(hostName) % 100000; //5 digit
 
-  console.log(
-    "The list of secret keys " +
-      "${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}"
-  );
-  const keyValuePairsJsonObj = JSON.parse(
-    "${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}"
-  );
+  console.log("The list of secret keys " + keyValuePairsJsonString);
+  const keyValuePairsJsonObj = JSON.parse(keyValuePairsJsonString);
 
   const envKeyPairsForDockerBuild = [];
 
@@ -365,5 +357,4 @@ module.exports = ({ github, context }) => {
   console.log("Result Object:" + JSON.stringify(resultObj));
 
   return JSON.stringify(resultObj);
-  
 };
