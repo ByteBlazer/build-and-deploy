@@ -437,7 +437,7 @@ jobs:
           echo ".......Logged in successfully to Docker  Hub"
           echo "Going to build the docker image......."
           dockerBuildCommand = "docker build -t ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} . --quiet" + "${{fromJson(steps.EvaluateParams.outputs.result).buildArgsCommandLineArgsForDockerBuild}}"
-          eval dockerBuildCommand
+          eval $dockerBuildCommand
           echo ".......docker image built succesfully"
           echo "Going to push the docker image to docker hub......."
           docker push ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} --quiet
