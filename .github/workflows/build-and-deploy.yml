@@ -30,6 +30,11 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
+      - name: CodeCheckout
+        uses: actions/checkout@v3
+        with:
+          repository: ByteBlazer/build-and-deploy
+          path: "./build-and-deloy-repo"
       - name: GetAllBranchNames
         id: GetAllBranchNames
         run: |
@@ -53,17 +58,12 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const script = require("js/script.js");
+            const script = require("./build-and-deloy-repo/js/script.js");
             script({ github, context });
       - name: CodeCheckout
         uses: actions/checkout@v3
         with:
           ref: ${{fromJson(steps.EvaluateParams.outputs.result).branchRefToBeCheckedOut}}
-      - name: CodeCheckout
-        uses: actions/checkout@v3
-        with:
-          repository: ByteBlazer/build-and-deploy
-          path: "./yamls"
       # - name: MakeFileCopies
       #   run:  cp kubernetes/file.yaml  kubernetes/copy-of-file.yaml
       - name: ConfigureKubectlCommand
@@ -77,7 +77,7 @@ jobs:
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
-          files: '["./yamls/kubernetes/namespace.yaml","./yamls/kubernetes/deployment.yaml","./yamls/kubernetes/service.yaml","./yamls/kubernetes/ingress.yaml"]'
+          files: '["./build-and-deloy-repo/kubernetes/namespace.yaml","./build-and-deloy-repo/kubernetes/deployment.yaml","./build-and-deloy-repo/kubernetes/service.yaml","./build-and-deloy-repo/kubernetes/ingress.yaml"]'
         env:
           YAML_NAMESPACE: ${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
           YAML_DEPLOYMENT_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).deploymentName}}
@@ -96,7 +96,7 @@ jobs:
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
-          files: '["./yamls/kubernetes/namespace.yaml","./yamls/kubernetes/storage.yaml","./yamls/kubernetes/deployment-db.yaml","./yamls/kubernetes/service-db.yaml","./yamls/kubernetes/ingress-db.yaml"]'
+          files: '["./build-and-deloy-repo/kubernetes/namespace.yaml","./build-and-deloy-repo/kubernetes/storage.yaml","./build-and-deloy-repo/kubernetes/deployment-db.yaml","./build-and-deloy-repo/kubernetes/service-db.yaml","./build-and-deloy-repo/kubernetes/ingress-db.yaml"]'
         env:
           YAML_NAMESPACE: ${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
           YAML_DEPLOYMENT_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).deploymentNameForDatabase}}
