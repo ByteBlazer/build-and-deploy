@@ -57,8 +57,6 @@ module.exports = ({
 
   let branchRefToBeCheckedOut = "NA";
   let namespace = "NA";
-  let deploymentName = "NA";
-  let deploymentNameForDatabase = "NA";
   let groupName = "NA";
   let containerName = "NA";
   let containerNameForDatabase = "NA";
@@ -248,9 +246,6 @@ module.exports = ({
   numericHashOfHostAndPortForDatabase =
     hash(hostName + containerPortForDatabase) % 1000; //Less than 1000
 
-  deploymentName = applicationName + "-" + groupName;
-  deploymentNameForDatabase = applicationNameForDatabase + "-" + groupName;
-
   ingressLbName = "ingress-lb" + "-" + namespace;
   hashBasedDBPassword = hash(hostName) % 100000; //5 digit
 
@@ -336,8 +331,6 @@ module.exports = ({
   const resultObj = {
     branchRefToBeCheckedOut,
     namespace,
-    deploymentName,
-    deploymentNameForDatabase,
     numberOfReplicas,
     containerName,
     containerNameForDatabase,

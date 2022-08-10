@@ -84,7 +84,6 @@ jobs:
           files: '["./build-and-deloy-repo/kubernetes/namespace.yaml","./build-and-deloy-repo/kubernetes/deployment.yaml","./build-and-deloy-repo/kubernetes/service.yaml","./build-and-deloy-repo/kubernetes/ingress.yaml"]'
         env:
           YAML_NAMESPACE: ${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
-          YAML_DEPLOYMENT_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).deploymentName}}
           YAML_DEPLOYMENT_NUMBER_OF_REPLICAS: ${{fromJson(steps.EvaluateParams.outputs.result).numberOfReplicas}}
           YAML_CONTAINER_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).containerName}}
           YAML_CONTAINER_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).containerPort}}
@@ -104,7 +103,6 @@ jobs:
           files: '["./build-and-deloy-repo/kubernetes/namespace.yaml","./build-and-deloy-repo/kubernetes/storage.yaml","./build-and-deloy-repo/kubernetes/deployment-db.yaml","./build-and-deloy-repo/kubernetes/service-db.yaml","./build-and-deloy-repo/kubernetes/ingress-db.yaml"]'
         env:
           YAML_NAMESPACE: ${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
-          YAML_DEPLOYMENT_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).deploymentNameForDatabase}}
           YAML_CONTAINER_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).containerNameForDatabase}}
           YAML_CONTAINER_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).containerPortForDatabase}}
           YAML_SERVICE_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}}
