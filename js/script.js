@@ -209,6 +209,7 @@ module.exports = ({
       hostName = targetRootDomain;
       dockerImageNameAndTag = corp + "/" + applicationName;
       numberOfReplicas = numberOfReplicas;
+      dbPodNeedsToBeDeployed = false;
     }
     if (context.ref == "refs/heads/release") {
       console.log("The current branch is: release");
@@ -220,6 +221,7 @@ module.exports = ({
       hostName = "test" + "." + targetRootDomain;
       dockerImageNameAndTag = corp + "/" + applicationName + ":" + "test";
       numberOfReplicas = numberOfReplicas;
+      dbPodNeedsToBeDeployed = false;
     }
     if (context.ref.startsWith("refs/heads/feature/")) {
       featureBranchNameExcludingPrefix = context.ref.split(
@@ -360,6 +362,7 @@ module.exports = ({
     dbSchemaName,
     hashBasedDBPassword,
     buildArgsCommandLineArgsForDockerBuild,
+    dbPodNeedsToBeDeployed
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));
