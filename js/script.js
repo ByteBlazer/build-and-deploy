@@ -18,7 +18,7 @@ module.exports = ({
   containerPort,
   pathPattern,
   numberOfApplicationReplicas,
-  needsDatabaseInstallation,
+  needsDatabase,
 }) => {
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
@@ -38,9 +38,8 @@ module.exports = ({
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
 
   let numberOfReplicas = numberOfApplicationReplicas;
-  let dbPodNeedsToBeDeployed = needsDatabaseInstallation; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no.
-  console.log({dbPodNeedsToBeDeployed});
-
+  let dbPodNeedsToBeDeployed = needsDatabase; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no.
+  
   let applicationBaseName = applicationName.split("-")[0];
   let applicationPostFix = applicationName.split("-")[1];
   if (!applicationBaseName || !applicationPostFix) {
