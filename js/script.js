@@ -39,6 +39,7 @@ module.exports = ({
 
   let numberOfReplicas = numberOfApplicationReplicas;
   let dbPodNeedsToBeDeployed = needsDatabaseInstallation; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no.
+  console.log({dbPodNeedsToBeDeployed});
 
   let applicationBaseName = applicationName.split("-")[0];
   let applicationPostFix = applicationName.split("-")[1];
