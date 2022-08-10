@@ -97,7 +97,7 @@ module.exports = ({
     console.log("This run is because of a respository_dispatch event");
 
     console.log({triggeredByAnotherApp,humanTriggered});
-    console.log(payload);
+    console.log(JSON.stringify(payload));
     console.log(triggeredByAnotherApp==true);
 
     namespace = nameOfLightweightNamespace;
