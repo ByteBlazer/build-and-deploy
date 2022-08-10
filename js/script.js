@@ -6,7 +6,7 @@ module.exports = ({
   featureBranchName,
   triggeredBy,
   phoneNumberLastFiveDigits,
-  fastForwardServerMilliseconds,//TODO: To be used in future
+  fastForwardServerMilliseconds, //TODO: To be used in future
   corp,
   nameOfLightweightNamespace,
   nameOfTestNamespace,
@@ -19,6 +19,7 @@ module.exports = ({
   pathPattern,
   numberOfApplicationReplicas,
   needsDatabase,
+  sisterApps
 }) => {
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
@@ -38,8 +39,8 @@ module.exports = ({
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
 
   let numberOfReplicas = numberOfApplicationReplicas;
-  let dbPodNeedsToBeDeployed = needsDatabase; //TODO: Use this in kubectl command db part. If release and prod,then no. If angular,then no.
-  
+  let dbPodNeedsToBeDeployed = needsDatabase;
+
   let applicationBaseName = applicationName.split("-")[0];
   let applicationPostFix = applicationName.split("-")[1];
   if (!applicationBaseName || !applicationPostFix) {
@@ -70,6 +71,7 @@ module.exports = ({
   let dockerImageNameAndTag = "NA";
   let env = "NA";
 
+  const githubApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/dispatches";
   const dockerPhraseForCommonEnvVariables = "COMMON";
   const envNameForProduction = "PROD";
   const envNameForTest = "TEST";
@@ -239,6 +241,36 @@ module.exports = ({
       console.log(
         "Triggering the other applications also in the stack, so that the deployment can work as a whole unit independently"
       );
+
+      //TODO: ***********************************************************
+      
+      if(sisterApps){
+        let sisterAppsArray = sisterApps.split(",");
+        for (appName of sisterAppsArray) {
+          let githubApiEndPoint = githubApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',appName).replace('<CORP_NAME_PLACEHOLDER>',corp);
+          let postRequestBody = {
+            event_type: "ondemand",
+            client_payload: {
+              triggeredByAnotherApp: true,
+              featureBranchName: featureBranchNameExcludingPrefix,
+  
+              humanTriggered: false,
+              triggeredBy: "",
+              phoneNumberLastFiveDigits: "",
+              fastForwardServerMilliseconds: "0",
+            },
+          };
+          console.log(
+            "Going to trigger for appName:" +
+              appName +
+              " with endpoint as:" +
+              githubApiEndPoint +
+              " and POST request body as:" +
+              postRequestBody
+          );
+        }
+      }
+      
     }
   }
 
