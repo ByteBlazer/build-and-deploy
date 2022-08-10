@@ -97,7 +97,7 @@ jobs:
           YAML_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}}
       - name: ReplaceTokensInKubernetesDatabaseDeploymentFiles
         uses: cschleiden/replace-tokens@v1
-        if: dbPodNeedsToBeDeployed
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed}}
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
@@ -124,7 +124,7 @@ jobs:
           cat build-and-deloy-repo/kubernetes/service.yaml
           echo "\n**************************************************************************\n"
       - name: DEBUG-ViewReplacedK8sYaml For DB
-        if: dbPodNeedsToBeDeployed
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed}}
         run: |
           echo "\n********************   FOR DATABASE   ************************************\n"
           cat build-and-deloy-repo/kubernetes/deployment-db.yaml
@@ -154,7 +154,7 @@ jobs:
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceName}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
       - name: DeployDatabaseToKubernetes
-        if: dbPodNeedsToBeDeployed
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed}}
         run: |
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
