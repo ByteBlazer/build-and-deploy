@@ -95,6 +95,10 @@ module.exports = ({
   if (context.eventName == "repository_dispatch") {
     console.log("This run is because of a respository_dispatch event");
 
+    console.log({triggeredByAnotherApp,humanTriggered});
+    console.log(triggeredByAnotherApp=="true");
+    console.log(triggeredByAnotherApp==true);
+
     namespace = nameOfLightweightNamespace;
     numberOfReplicas = 1;
 
