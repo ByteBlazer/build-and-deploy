@@ -1,6 +1,7 @@
 module.exports = ({
   github,
   context,
+  payload,
   corp,
   nameOfLightweightNamespace,
   nameOfTestNamespace,
@@ -96,7 +97,7 @@ module.exports = ({
     console.log("This run is because of a respository_dispatch event");
 
     console.log({triggeredByAnotherApp,humanTriggered});
-    console.log(github);
+    console.log(payload);
     console.log(triggeredByAnotherApp==true);
 
     namespace = nameOfLightweightNamespace;
