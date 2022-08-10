@@ -185,8 +185,10 @@ module.exports = ({
     }
   } else {
     console.log(
-      "This run is an automated run which got triggered either because of a branch create, or a code commit. Will use the code from incoming branch itself."
+      "This run is an automated run which got triggered. Could have happened due to a lot of github events on the code repo."
     );
+
+    console.log('Will use the code from incoming branch itself.');
 
     branchRefToBeCheckedOut = context.ref;
     console.log(
