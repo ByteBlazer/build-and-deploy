@@ -1,7 +1,12 @@
 module.exports = ({
   github,
   context,
-  payload,
+  triggeredByAnotherApp,
+  humanTriggered,
+  featureBranchName,
+  triggeredBy,
+  phoneNumberLastFiveDigits,
+  fastForwardServerMilliseconds,//TODO: To be used in future
   corp,
   nameOfLightweightNamespace,
   nameOfTestNamespace,
@@ -29,18 +34,6 @@ module.exports = ({
     );
     return Math.abs(result);
   };
-
-  //Incoming variables
-  const triggeredByAnotherApp =
-    "${{github.event.client_payload.triggeredByAnotherApp}}";
-  const humanTriggered = "${{github.event.client_payload.humanTriggered}}";
-  const featureBranchName =
-    "${{github.event.client_payload.featureBranchName}}";
-  const triggeredBy = "${{github.event.client_payload.triggeredBy}}";
-  const phoneNumberLastFiveDigits =
-    "${{github.event.client_payload.phoneNumberLastFiveDigits}}";
-  const fastForwardServerMilliseconds = //TODO: For future dating of servers, needs to be implemented
-    "${{github.event.client_payload.fastForwardServerMilliseconds}}";
 
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
 
@@ -96,9 +89,9 @@ module.exports = ({
   if (context.eventName == "repository_dispatch") {
     console.log("This run is because of a respository_dispatch event");
 
-    console.log({triggeredByAnotherApp,humanTriggered});
+    console.log({ triggeredByAnotherApp, humanTriggered });
     console.log(JSON.stringify(payload));
-    console.log(triggeredByAnotherApp==true);
+    console.log(triggeredByAnotherApp == true);
 
     namespace = nameOfLightweightNamespace;
     numberOfReplicas = 1;
@@ -367,7 +360,7 @@ module.exports = ({
     dbSchemaName,
     hashBasedDBPassword,
     buildArgsCommandLineArgsForDockerBuild,
-    dbPodNeedsToBeDeployed
+    dbPodNeedsToBeDeployed,
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));
