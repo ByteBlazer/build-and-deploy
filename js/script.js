@@ -19,7 +19,7 @@ module.exports = ({
   pathPattern,
   numberOfApplicationReplicas,
   needsDatabase,
-  sisterApps
+  sisterApp
 }) => {
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
@@ -246,11 +246,16 @@ module.exports = ({
 
       //TODO: ***********************************************************
       
-      if(sisterApps){
-        let sisterAppsArray = sisterApps.split(",");
-        for (appName of sisterAppsArray) {
-          let githubApiEndPoint = githubApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',appName).replace('<CORP_NAME_PLACEHOLDER>',corp);
-          let postRequestBody = {
+      let sisterAppDeploymentRequired = false;
+      let githubApiEndPoint = 'NA';
+      let postRequestBodyJSON = 'NA';
+
+      if(sisterApp){
+
+        sisterAppDeploymentRequired = true;
+        
+          githubApiEndPoint = githubApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
+          const postRequestBody = {
             event_type: "ondemand",
             client_payload: {
               triggeredByAnotherApp: true,
@@ -262,15 +267,16 @@ module.exports = ({
               fastForwardServerMilliseconds: "0",
             },
           };
+          postRequestBodyJSON = JSON.stringify(postRequestBody);
           console.log(
-            "Going to trigger for appName:" +
-              appName +
+            "Going to trigger for sisterApp:" +
+            sisterApp +
               " with endpoint as:" +
               githubApiEndPoint +
-              " and POST request body as:" +
-              JSON.stringify(postRequestBody)
+              " and POST request body JSON as:" +
+              postRequestBodyJSON
           );
-        }
+        
       }
       
     }
@@ -384,6 +390,9 @@ module.exports = ({
     hashBasedDBPassword,
     buildArgsCommandLineArgsForDockerBuild,
     dbPodNeedsToBeDeployed,
+    sisterAppDeploymentRequired,
+    githubApiEndPoint,
+    postRequestBodyJSON
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));
