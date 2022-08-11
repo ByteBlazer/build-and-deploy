@@ -268,7 +268,7 @@ module.exports = ({
               " with endpoint as:" +
               githubApiEndPoint +
               " and POST request body as:" +
-              postRequestBody
+              JSON.stringify(postRequestBody)
           );
         }
       }
