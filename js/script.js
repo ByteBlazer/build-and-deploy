@@ -230,6 +230,10 @@ module.exports = ({
         "The current branch is a feature branch. The prefix is feature/ and the name is:" +
           featureBranchNameExcludingPrefix
       );
+      if(featureBranchNameExcludingPrefix == 'test'){
+        throw new Error('The feature branch cannot be named as: test as this subdomain is reserved for release environment, please use another name');
+      }
+
       groupName = featureBranchNameExcludingPrefix;
       env = envNameForLightWeight;
 
