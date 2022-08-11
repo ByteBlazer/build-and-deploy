@@ -253,7 +253,7 @@ module.exports = ({
         sisterAppDeploymentRequired = true;
         
           console.log("CORP:"+corp.substring(1));
-          githubApiEndPoint = githubApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>','byteblazer');
+          githubApiEndPoint = githubApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>','byteblaze');
           const postRequestBody = {
             event_type: "ondemand",
             client_payload: {
