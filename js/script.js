@@ -1,7 +1,7 @@
 module.exports = ({
   github,
   context,
-  triggeredByAnotherApp,
+  triggeredBySisterApp,
   humanTriggered,
   featureBranchName,
   triggeredBy,
@@ -57,6 +57,7 @@ module.exports = ({
   let servicePortForDatabase = "3306"; //TODO: Make this dynamic
 
   let branchRefToBeCheckedOut = "NA";
+  let branchNameToBeCheckedOut = "NA";
   let namespace = "NA";
   let groupName = "NA";
   let containerName = "NA";
@@ -70,11 +71,14 @@ module.exports = ({
   let hostName = "NA";
   let dockerImageNameAndTag = "NA";
   let env = "NA";
-  let githubApiEndPoint = 'NA';
+  let githubDispatchApiEndpoint = 'NA';
+  let githubBranchesApiEndpoint = 'NA';
   let postRequestBodyJSON = 'NA';
-  let sisterAppDeploymentRequired = false;
+  let triggerSisterAppInCaseCorrespondingBranchDoesNOTExist = false;
+  let githubBranchesApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/branches";
 
-  const githubApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/dispatches";
+
+  const githubDispatchApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/dispatches";
   const dockerPhraseForCommonEnvVariables = "COMMON";
   const envNameForProduction = "PROD";
   const envNameForTest = "TEST";
@@ -97,22 +101,22 @@ module.exports = ({
 
     if (
       //Any one should be true at a time, other should be false. If not, error out.
-      (triggeredByAnotherApp == "true" && humanTriggered == "true") ||
-      (triggeredByAnotherApp == "false" && humanTriggered == "false")
+      (triggeredBySisterApp == "true" && humanTriggered == "true") ||
+      (triggeredBySisterApp == "false" && humanTriggered == "false")
     ) {
       throw new Error(
-        "Among triggeredByAnotherApp and humanTriggered, any ONE HAS to be true, and the other SHOULD be false."
+        "Among triggeredBySisterApp and humanTriggered, any ONE HAS to be true, and the other SHOULD be false."
       );
     }
 
-    if (triggeredByAnotherApp == "true") {
+    if (triggeredBySisterApp == "true") {
       console.log(
         "This run is triggered because of another applications feature branch creation process. For e.g. if a feature branch is cut from myapp-ui, then myapp-api also needs to be deployed in order to complete the stack."
       );
 
       if (!featureBranchName) {
         throw new Error(
-          "If triggeredByAnotherApp, featureBranchName needs to be sent."
+          "If triggeredBySisterApp, featureBranchName needs to be sent."
         );
       } else {
         console.log(
@@ -254,14 +258,17 @@ module.exports = ({
       
       if(sisterApp){
 
-        sisterAppDeploymentRequired = true;
+        triggerSisterAppInCaseCorrespondingBranchDoesNOTExist = true;
         
-          console.log("CORP:"+corp.substring(1));
-          githubApiEndPoint = githubApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
+          //Get sister apps branches . Only if corresponding branch does not exist there, do we need to trigger
+          githubBranchesApiEndpoint = githubBranchesApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
+
+
+          githubDispatchApiEndpoint = githubDispatchApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
           const postRequestBody = {
             event_type: "ondemand",
             client_payload: {
-              triggeredByAnotherApp: true,
+              triggeredBySisterApp: true,
               featureBranchName: featureBranchNameExcludingPrefix,
   
               humanTriggered: false,
@@ -275,7 +282,7 @@ module.exports = ({
             "Going to trigger for sisterApp:" +
             sisterApp +
               " with endpoint as:" +
-              githubApiEndPoint +
+              githubDispatchApiEndpoint +
               " and POST request body JSON as:" +
               postRequestBodyJSON
           );
@@ -371,8 +378,11 @@ module.exports = ({
       buildArgsCommandLineArgsForDockerBuild
   );
 
+  branchNameToBeCheckedOut = branchRefToBeCheckedOut.split('refs/heads/')[1];
+
   const resultObj = {
     branchRefToBeCheckedOut,
+    branchNameToBeCheckedOut,
     namespace,
     numberOfReplicas,
     containerName,
@@ -393,8 +403,9 @@ module.exports = ({
     hashBasedDBPassword,
     buildArgsCommandLineArgsForDockerBuild,
     dbPodNeedsToBeDeployed,
-    sisterAppDeploymentRequired,
-    githubApiEndPoint,
+    triggerSisterAppInCaseCorrespondingBranchDoesNOTExist,
+    githubDispatchApiEndpoint,
+    githubBranchesApiEndpoint,
     postRequestBodyJSON
   };
 

@@ -61,15 +61,22 @@ jobs:
           result-encoding: string
           script: |
             const script = require('./build-and-deloy-repo/js/script.js');
-            return script({ github, context, triggeredByAnotherApp:"${{github.event.client_payload.triggeredByAnotherApp}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerMilliseconds:"${{github.event.client_payload.fastForwardServerMilliseconds}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
+            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerMilliseconds:"${{github.event.client_payload.fastForwardServerMilliseconds}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
       - name: TriggerSisterAppDeployment
         id: TriggerSisterAppDeployment
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).sisterAppDeploymentRequired == true}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).triggerSisterAppInCaseCorrespondingBranchDoesNOTExist == true}}
         run: |
+          curl --location --request GET '${{fromJson(steps.EvaluateParams.outputs.result).githubBranchesApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o sisterAppBranches.json
+          branchExistsInSisterApp="$(cat sisterAppBranches.json | jq -r '.[].name'|awk '{print $1}' | grep '${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}') | wc -l"
+          if [ branchExistsInSisterApp == "1" ]
+          then
           echo "Triggering request for sisterApp...."
-          curl -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Accept: application/vnd.github+json" --request POST '${{fromJson(steps.EvaluateParams.outputs.result).githubApiEndPoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o response.json
+          curl -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Accept: application/vnd.github+json" --request POST '${{fromJson(steps.EvaluateParams.outputs.result).githubDispatchApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o response.json
           cat response.json
           echo "....sisterApp deployment triggered."
+          else
+          echo "SisterApp was not deployed as the corresponding branch: $branchNameToBeCheckedOut already exists in the sisterApp"
+          fi
       - name: CodeCheckout
         uses: actions/checkout@v3
         with:
