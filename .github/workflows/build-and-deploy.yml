@@ -67,8 +67,7 @@ jobs:
         if: ${{fromJson(steps.EvaluateParams.outputs.result).sisterAppDeploymentRequired == true}}
         run: |
           echo "Triggering request for sisterApp...."
-          gitHubUrl="$(echo '${{fromJson(steps.EvaluateParams.outputs.result).githubApiEndPoint}}')";
-          curl --request POST 'https://api.github.com/repos/byteblazer/looper-api/dispatches' -o response.json
+          curl -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Accept: application/vnd.github+json" --request POST '${{fromJson(steps.EvaluateParams.outputs.result).githubApiEndPoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o response.json
           cat response.json
           echo "....sisterApp deployment triggered."
       - name: CodeCheckout
