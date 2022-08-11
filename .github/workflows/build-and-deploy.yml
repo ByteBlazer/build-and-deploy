@@ -68,7 +68,7 @@ jobs:
         run: |
           echo "Triggering request for sisterApp...."
           gitHubUrl="$(echo '${{fromJson(steps.EvaluateParams.outputs.result).githubApiEndPoint}}')";
-          curl --location -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Accept: application/vnd.github+json" --request POST gitHubUrl --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' -o response.json
+          curl --location -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Accept: application/vnd.github+json" --request POST $gitHubUrl --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' -o response.json
           cat response.json
           echo "....sisterApp deployment triggered."
       - name: CodeCheckout
