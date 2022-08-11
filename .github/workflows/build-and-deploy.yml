@@ -67,7 +67,7 @@ jobs:
         if: ${{fromJson(steps.EvaluateParams.outputs.result).sisterAppDeploymentRequired == true}}
         run: |
           echo "Triggering request for sisterApp...."
-          curl -v --location -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Content-Type: application/json" --request POST ${{fromJson(steps.EvaluateParams.outputs.result).githubApiEndPoint}} --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -o response.json
+          curl -v --location -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Accept: application/vnd.github+json" --request POST ${{fromJson(steps.EvaluateParams.outputs.result).githubApiEndPoint}} --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -o response.json
           cat response.json
           echo "....sisterApp deployment triggered."
       - name: CodeCheckout
