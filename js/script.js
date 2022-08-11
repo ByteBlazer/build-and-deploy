@@ -70,6 +70,9 @@ module.exports = ({
   let hostName = "NA";
   let dockerImageNameAndTag = "NA";
   let env = "NA";
+  let githubApiEndPoint = 'NA';
+  let postRequestBodyJSON = 'NA';
+  let sisterAppDeploymentRequired = false;
 
   const githubApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/dispatches";
   const dockerPhraseForCommonEnvVariables = "COMMON";
@@ -244,12 +247,7 @@ module.exports = ({
         "Triggering the other applications also in the stack, so that the deployment can work as a whole unit independently"
       );
 
-      //TODO: ***********************************************************
       
-      let sisterAppDeploymentRequired = false;
-      let githubApiEndPoint = 'NA';
-      let postRequestBodyJSON = 'NA';
-
       if(sisterApp){
 
         sisterAppDeploymentRequired = true;
