@@ -68,8 +68,7 @@ jobs:
         run: |
           curl --location --request GET '${{fromJson(steps.EvaluateParams.outputs.result).githubBranchesApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o sisterAppBranches.json
           branchExistsInSisterApp="$(cat sisterAppBranches.json | jq -r '.[].name'|awk '{print $1}' | grep '${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}' | wc -l)"
-          cat branchExistsInSisterApp
-          if [ branchExistsInSisterApp == "0" ]
+          if [ $branchExistsInSisterApp == "0" ]
           then
           echo "Triggering request for sisterApp...."
           curl -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Accept: application/vnd.github+json" --request POST '${{fromJson(steps.EvaluateParams.outputs.result).githubDispatchApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o response.json
