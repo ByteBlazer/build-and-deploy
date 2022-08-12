@@ -70,7 +70,7 @@ jobs:
           echo 'hello world'
           branchExistsInSisterApp="$(cat sisterAppBranches.json  | jq -r '.[].name'|awk '{print $1}' )"
           echo $branchExistsInSisterApp
-          branchExistsInSisterApp="$(cat sisterAppBranches.json | jq -r '.[].name'|awk '{print $1}' | grep '${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}') | wc -l)"
+          branchExistsInSisterApp="$(cat sisterAppBranches.json | jq -r '.[].name'|awk '{print $1}' | grep '${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}' | wc -l)"
           echo $branchExistsInSisterApp
           if [ branchExistsInSisterApp == "1" ]; then echo "hello world";fi
           if [ branchExistsInSisterApp == "1" ]
