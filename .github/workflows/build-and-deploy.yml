@@ -68,6 +68,7 @@ jobs:
         run: |
           curl --location --request GET '${{fromJson(steps.EvaluateParams.outputs.result).githubBranchesApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o sisterAppBranches.json
           branchExistsInSisterApp="$(cat sisterAppBranches.json | jq -r '.[].name'|awk '{print $1}' | grep '${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}' | wc -l)"
+          cat branchExistsInSisterApp
           if [ branchExistsInSisterApp == "0" ]
           then
           echo "Triggering request for sisterApp...."
@@ -75,7 +76,7 @@ jobs:
           cat response.json
           echo "....sisterApp deployment triggered."
           else
-          echo "SisterApp was not deployed as the corresponding branch: $branchNameToBeCheckedOut already exists in the sisterApp"
+          echo "SisterApp was not deployed as the corresponding branch: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}} already exists in the sisterApp"
           fi
       - name: CodeCheckout
         uses: actions/checkout@v3
