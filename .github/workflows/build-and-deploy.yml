@@ -114,7 +114,7 @@ jobs:
           YAML_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}}
       - name: ReplaceTokensInKubernetesDatabaseDeploymentFiles
         uses: cschleiden/replace-tokens@v1
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed ==  "true"}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed ==  'true'}}
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
@@ -140,7 +140,7 @@ jobs:
           cat build-and-deloy-repo/kubernetes/service.yaml
           echo "\n**************************************************************************\n"
       - name: DEBUG-ViewReplacedK8sYaml For DB
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == "true"}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true'}}
         run: |
           echo "\n********************   FOR DATABASE   ************************************\n"
           cat build-and-deloy-repo/kubernetes/deployment-db.yaml
@@ -176,7 +176,7 @@ jobs:
         run: |
           kubectl ${{steps.DecideOnApplyOrDelete.outputs.applyOrDelete}} -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeployOrDeleteDatabaseToKubernetes
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == "true"}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true'}}
         run: |
           kubectl ${{steps.DecideOnApplyOrDelete.outputs.applyOrDelete}} -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
       - name: RestartApplicationInKubernetes
@@ -184,6 +184,6 @@ jobs:
         run: |
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceName}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
       - name: RestartDatabaseInKubernetes
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == "true" && github.event_name != 'delete'}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && github.event_name != 'delete'}}
         run: |
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
