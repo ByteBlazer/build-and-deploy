@@ -181,11 +181,11 @@ jobs:
       - name: DeleteApplicationFromKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == true}}
         run: |
-          kubectl delete -f build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml 2>/dev/null
+          kubectl delete -f build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml; exit 0;
       - name: DeleteDatabaseFromKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == true}}
         run: |
-          kubectl delete -f build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml 2>/dev/null
+          kubectl delete -f build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml; exit 0;
       - name: RestartApplicationInKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
