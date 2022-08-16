@@ -2,6 +2,7 @@ module.exports = ({
   github,
   context,
   triggeredBySisterApp,
+  triggeredByBranchDeleteEvent,
   humanTriggered,
   featureBranchName,
   triggeredBy,
@@ -75,6 +76,7 @@ module.exports = ({
   let githubBranchesApiEndpoint = 'NA';
   let postRequestBodyJSON = 'NA';
   let triggerSisterAppInCaseCorrespondingBranchDoesNOTExist = false;
+  let deleteFlow = false;
   let githubBranchesApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/branches";
 
 
@@ -96,11 +98,20 @@ module.exports = ({
   if (context.eventName == "delete"){
     console.log("This is a delete event trigger. Only feature branch delete events reach here. SO if we have reached here, confirmed that it was a feature branch deletion.");
     context.ref = 'refs/heads/'+context.payload.ref;
+    deleteFlow=true;
     console.log(context.ref);
   }
+  
 
   if (context.eventName == "repository_dispatch") {
     console.log("This run is because of a respository_dispatch event");
+
+    if (triggeredByBranchDeleteEvent == "true"){
+      console.log("The parent app was deleted. So this app being the sister app should also get deleted.");
+      context.ref = 'refs/heads/feature/'+featureBranchName;
+      deleteFlow=true;
+      console.log(context.ref);
+    }
 
     namespace = nameOfLightweightNamespace;
     numberOfReplicas = 1;
@@ -265,6 +276,12 @@ module.exports = ({
       if(sisterApp){
 
         triggerSisterAppInCaseCorrespondingBranchDoesNOTExist = true;
+
+          let triggeredByBranchDeleteEvent = false;
+          if(context.eventName == "delete"){
+            triggeredByBranchDeleteEvent = true;
+          }
+
         
           //Get sister apps branches . Only if corresponding branch does not exist there, do we need to trigger
           githubBranchesApiEndpoint = githubBranchesApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
@@ -276,6 +293,7 @@ module.exports = ({
             client_payload: {
               triggeredBySisterApp: true,
               featureBranchName: featureBranchNameExcludingPrefix,
+              triggeredByBranchDeleteEvent: triggeredByBranchDeleteEvent,
   
               humanTriggered: false,
               triggeredBy: "",
@@ -412,7 +430,8 @@ module.exports = ({
     triggerSisterAppInCaseCorrespondingBranchDoesNOTExist,
     githubDispatchApiEndpoint,
     githubBranchesApiEndpoint,
-    postRequestBodyJSON
+    postRequestBodyJSON,
+    deleteFlow
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));
