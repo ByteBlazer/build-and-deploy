@@ -93,7 +93,8 @@ module.exports = ({
   containerName = applicationName;
   containerNameForDatabase = applicationNameForDatabase;
 
-  console.log("${{github.event_name}}");
+  
+  console.log(JSON.stringify(github));
   if ("${{github.event_name}}" == "delete"){
     console.log("This is a delete event trigger. Only feature branch delete events reach here. SO if we have reached here, confirmed that it was a feature branch deletion.");
     context.ref = 'refs/heads/'+"${{github.event.ref}}";
