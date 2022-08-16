@@ -174,11 +174,11 @@ jobs:
           echo ".......image push to docker hub completed succesfully"
       - name: DeployOrDeleteApplicationToKubernetes
         run: |
-          kubectl ${{fromJson(steps.DecideOnApplyOrDelete.outputs).applyOrDelete}} -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
+          kubectl ${{steps.DecideOnApplyOrDelete.outputs.applyOrDelete}} -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeployOrDeleteDatabaseToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed}}
         run: |
-          kubectl ${{fromJson(steps.DecideOnApplyOrDelete.outputs).applyOrDelete}} -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
+          kubectl ${{steps.DecideOnApplyOrDelete.outputs.applyOrDelete}} -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
       - name: RestartApplicationInKubernetes
         if: ${{github.event_name != 'delete'}}
         run: |
