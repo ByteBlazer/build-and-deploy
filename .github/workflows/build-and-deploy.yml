@@ -153,9 +153,11 @@ jobs:
           if [ ${{github.event_name}} == 'delete' ];then applyOrDelete=delete;else applyOrDelete=apply;fi  
           echo "::set-output name=applyOrDelete::$applyOrDelete"
       - name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
+        if: ${{github.event_name != 'delete'}}
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
       - name: BuildAndPushDockerImage
+        if: ${{github.event_name != 'delete'}}
         run: |
           echo "Going to login to Docker Hub....."
           echo "${{ secrets.DOCKER_LOGIN_PASSWORD}}"|docker login --username ${{ secrets.DOCKER_LOGIN_USER}} --password-stdin 
