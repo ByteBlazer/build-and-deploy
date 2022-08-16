@@ -78,6 +78,7 @@ jobs:
           echo "SisterApp was not deployed as the corresponding branch: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}} already exists in the sisterApp"
           fi
       - name: CodeCheckout
+        if: ${{github.event_name != 'delete'}}
         uses: actions/checkout@v3
         with:
           ref: ${{fromJson(steps.EvaluateParams.outputs.result).branchRefToBeCheckedOut}}
