@@ -149,11 +149,11 @@ jobs:
           cat build-and-deloy-repo/kubernetes/service-db.yaml
           echo "\n**************************************************************************\n"
       - name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
-        if: ${{!fromJson(steps.EvaluateParams.outputs.result).deleteFlow}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
       - name: BuildAndPushDockerImage
-        if: ${{!fromJson(steps.EvaluateParams.outputs.result).deleteFlow}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow ==  false}}
         run: |
           echo "Going to login to Docker Hub....."
           echo "${{ secrets.DOCKER_LOGIN_PASSWORD}}"|docker login --username ${{ secrets.DOCKER_LOGIN_USER}} --password-stdin 
@@ -169,26 +169,26 @@ jobs:
           docker push ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} --quiet
           echo ".......image push to docker hub completed succesfully"
       - name: DeployApplicationToKubernetes
-        if: ${{!fromJson(steps.EvaluateParams.outputs.result).deleteFlow}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeployDatabaseToKubernetes
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && !fromJson(steps.EvaluateParams.outputs.result).deleteFlow }}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow = false}}
         run: |
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
       - name: DeleteApplicationFromKubernetes
-        if: ${{!fromJson(steps.EvaluateParams.outputs.result).deleteFlow}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == true}}
         run: |
           kubectl delete -f build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeleteDatabaseFromKubernetes
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && !fromJson(steps.EvaluateParams.outputs.result).deleteFlow}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == true}}
         run: |
           kubectl delete -f build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
       - name: RestartApplicationInKubernetes
-        if: ${{!fromJson(steps.EvaluateParams.outputs.result).deleteFlow}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceName}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
       - name: RestartDatabaseInKubernetes
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && !fromJson(steps.EvaluateParams.outputs.result).deleteFlow}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
