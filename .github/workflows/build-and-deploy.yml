@@ -70,12 +70,12 @@ jobs:
           branchExistsInSisterApp="$(cat sisterAppBranches.json | jq -r '.[].name'|awk '{print $1}' | grep '${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}' | wc -l)"
           if [ $branchExistsInSisterApp == "0" ]
           then
-          echo "Triggering request for sisterApp...."
+          echo "Triggering request for sisterApp deployment/delete...."
           curl -d '${{fromJson(steps.EvaluateParams.outputs.result).postRequestBodyJSON}}' -H "Accept: application/vnd.github+json" --request POST '${{fromJson(steps.EvaluateParams.outputs.result).githubDispatchApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o response.json
           cat response.json
-          echo "....sisterApp deployment triggered."
+          echo "....sisterApp deployment/delete triggered."
           else
-          echo "SisterApp was not deployed as the corresponding branch: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}} already exists in the sisterApp"
+          echo "SisterApp was not deployed/deleted as the corresponding branch: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}} already exists in the sisterApp"
           fi
       - name: CodeCheckout
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
@@ -147,6 +147,8 @@ jobs:
           cat build-and-deloy-repo/kubernetes/deployment-db.yaml
           echo "\n**************************************************************************\n"
           cat build-and-deloy-repo/kubernetes/service-db.yaml
+          echo "\n**************************************************************************\n"
+          cat build-and-deloy-repo/kubernetes/pvc.yaml
           echo "\n**************************************************************************\n"
       - name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
