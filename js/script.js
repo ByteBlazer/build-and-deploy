@@ -93,12 +93,9 @@ module.exports = ({
   containerName = applicationName;
   containerNameForDatabase = applicationNameForDatabase;
 
-  
-  
-  console.log(JSON.stringify(context));
   if (context.eventName == "delete"){
     console.log("This is a delete event trigger. Only feature branch delete events reach here. SO if we have reached here, confirmed that it was a feature branch deletion.");
-    context.ref = 'refs/heads/'+context.ref;
+    context.ref = 'refs/heads/'+context.payload.ref;
     console.log(context.ref);
   }
 
