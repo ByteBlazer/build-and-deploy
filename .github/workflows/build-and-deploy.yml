@@ -148,11 +148,6 @@ jobs:
           echo "\n**************************************************************************\n"
           cat build-and-deloy-repo/kubernetes/service-db.yaml
           echo "\n**************************************************************************\n"
-      - name: DecideOnApplyOrDelete
-        id: DecideOnApplyOrDelete
-        run: |
-          if [ ${{github.event_name}} == 'delete' ];then applyOrDelete=delete;else applyOrDelete=apply;fi  
-          echo "::set-output name=applyOrDelete::$applyOrDelete"
       - name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
         if: ${{github.event_name != 'delete'}}
         uses: satackey/action-docker-layer-caching@v0.0.11
@@ -174,19 +169,19 @@ jobs:
           docker push ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} --quiet
           echo ".......image push to docker hub completed succesfully"
       - name: DeployApplicationToKubernetes
-        if: ${{steps.DecideOnApplyOrDelete.outputs.applyOrDelete == 'apply'}}
+        if: ${{github.event_name != 'delete'}}
         run: |
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeployDatabaseToKubernetes
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && steps.DecideOnApplyOrDelete.outputs.applyOrDelete == 'apply'}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && github.event_name != 'delete' }}
         run: |
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
       - name: DeleteApplicationFromKubernetes
-        if: ${{steps.DecideOnApplyOrDelete.outputs.applyOrDelete == 'delete'}}
+        if: ${{ github.event_name == 'delete' }}
         run: |
           kubectl delete -f build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeleteDatabaseFromKubernetes
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && steps.DecideOnApplyOrDelete.outputs.applyOrDelete == 'delete'}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && github.event_name == 'delete'}}
         run: |
           kubectl delete -f build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
       - name: RestartApplicationInKubernetes
