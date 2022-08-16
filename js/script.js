@@ -96,9 +96,9 @@ module.exports = ({
   
   
   console.log(JSON.stringify(context));
-  if ("${{github.event_name}}" == "delete"){
+  if (context.eventName == "delete"){
     console.log("This is a delete event trigger. Only feature branch delete events reach here. SO if we have reached here, confirmed that it was a feature branch deletion.");
-    context.ref = 'refs/heads/'+"${{github.event.ref}}";
+    context.ref = 'refs/heads/'+context.ref;
     console.log(context.ref);
   }
 
