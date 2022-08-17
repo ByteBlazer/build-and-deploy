@@ -24,6 +24,9 @@ on:
       sisterApp:
         required: false
         type: string
+      angularApp:
+        required: false
+        type: boolean
 
 jobs:
   kubernetes-deployment:
@@ -89,6 +92,16 @@ jobs:
         with:
           repository: ByteBlazer/build-and-deploy
           path: "./build-and-deloy-repo"
+      - name: ReplaceTokensInAngularEnvironmentFiles
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == true}}
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: "<<"
+          tokenSuffix: ">>"
+          files: '["./environments/environment.prod.ts"]'
+        env:
+          BACKEND_APP_HOST_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
+          BACKEND_APP_BASE_CONTEXT: ${{fromJson(steps.EvaluateParams.outputs.result).pathPatternWithoutTrailingSlash}}
       - name: ConfigureKubectlCommand
         run: |
           echo 'Configuring kubectl command to talk to EKS cluster inside corporate AWS account.......'

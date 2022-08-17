@@ -18,6 +18,7 @@ module.exports = ({
   applicationName,
   containerPort,
   pathPattern,
+  pathPatternWithoutTrailingSlash,
   numberOfApplicationReplicas,
   needsDatabase,
   sisterApp
@@ -38,6 +39,7 @@ module.exports = ({
   };
 
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
+  const pathPatternWithoutTrailingSlash = pathPattern.substring(0,pathPattern.length-1);
 
   let numberOfReplicas = numberOfApplicationReplicas;
   let dbPodNeedsToBeDeployed = needsDatabase;
@@ -422,6 +424,7 @@ module.exports = ({
     ingressLbName,
     hostName,
     pathPattern,
+    pathPatternWithoutTrailingSlash,
     dockerImageNameAndTag,
     dbSchemaName,
     hashBasedDBPassword,
