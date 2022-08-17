@@ -98,10 +98,16 @@ jobs:
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
-          files: '["./environments/environment.prod.ts"]'
+          files: '["./src/environments/environment.prod.ts"]'
         env:
           BACKEND_APP_HOST_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           BACKEND_APP_BASE_CONTEXT: ${{fromJson(steps.EvaluateParams.outputs.result).pathPatternWithoutTrailingSlash}}
+      - name: DEBUG-ViewAngularEnvFiles
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true'}}
+        run: |
+          echo "\n**************************************************************************\n"
+          cat src/environments/environment.prod.ts
+          echo "\n**************************************************************************\n"
       - name: ConfigureKubectlCommand
         run: |
           echo 'Configuring kubectl command to talk to EKS cluster inside corporate AWS account.......'
