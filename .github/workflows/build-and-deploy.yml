@@ -27,6 +27,9 @@ on:
       angularApp:
         required: false
         type: boolean
+      backendApiContextPath:
+        required: false
+        type: string
 
 jobs:
   kubernetes-deployment:
@@ -64,7 +67,7 @@ jobs:
           result-encoding: string
           script: |
             const script = require('./build-and-deloy-repo/js/script.js');
-            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerMilliseconds:"${{github.event.client_payload.fastForwardServerMilliseconds}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
+            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerMilliseconds:"${{github.event.client_payload.fastForwardServerMilliseconds}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
       - name: TriggerSisterAppDeploymentOrDelete
         id: TriggerSisterAppDeploymentOrDelete
         if: ${{fromJson(steps.EvaluateParams.outputs.result).triggerSisterAppInCaseCorrespondingBranchDoesNOTExist == true}}
@@ -101,7 +104,7 @@ jobs:
           files: '["./src/environments/environment.prod.ts"]'
         env:
           BACKEND_APP_HOST_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
-          BACKEND_APP_BASE_CONTEXT: ${{fromJson(steps.EvaluateParams.outputs.result).pathPatternWithoutTrailingSlash}}
+          BACKEND_APP_BASE_CONTEXT: ${{fromJson(steps.EvaluateParams.outputs.result).backendApiContextPath}}
       - name: DEBUG-ViewAngularEnvFiles
         if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true'}}
         run: |

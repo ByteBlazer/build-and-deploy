@@ -19,6 +19,7 @@ module.exports = ({
   containerPort,
   pathPattern,
   angularApp,
+  backendApiContextPath,
   numberOfApplicationReplicas,
   needsDatabase,
   sisterApp
@@ -39,7 +40,7 @@ module.exports = ({
   };
 
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
-  const pathPatternWithoutTrailingSlash = pathPattern.substring(0,pathPattern.length-1);
+  
 
   let numberOfReplicas = numberOfApplicationReplicas;
   let dbPodNeedsToBeDeployed = needsDatabase;
@@ -425,7 +426,7 @@ module.exports = ({
     hostName,
     pathPattern,
     angularApp,
-    pathPatternWithoutTrailingSlash,
+    backendApiContextPath,
     dockerImageNameAndTag,
     dbSchemaName,
     hashBasedDBPassword,
