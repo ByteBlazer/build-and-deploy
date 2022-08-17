@@ -19,7 +19,6 @@ module.exports = ({
   containerPort,
   pathPattern,
   angularApp,
-  pathPatternWithoutTrailingSlash,
   numberOfApplicationReplicas,
   needsDatabase,
   sisterApp
