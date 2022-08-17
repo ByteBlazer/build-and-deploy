@@ -93,7 +93,7 @@ jobs:
           repository: ByteBlazer/build-and-deploy
           path: "./build-and-deloy-repo"
       - name: ReplaceTokensInAngularEnvironmentFiles
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == true}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true'}}
         uses: cschleiden/replace-tokens@v1
         with:
           tokenPrefix: "<<"
