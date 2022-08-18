@@ -22,15 +22,15 @@ spec:
             - containerPort: <<YAML_CONTAINER_PORT>>
           readinessProbe:
             httpGet: 
-              path: <<YAML_PATH_PATTERN>>healthcheck/status
-              port: <<YAML_CONTAINER_PORT>>
+              path: https://<<YAML_HOST>>/api/healthcheck/status
+              port: 80
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 720
           livenessProbe:
             httpGet: 
-              path: <<YAML_PATH_PATTERN>>healthcheck/status
-              port: <<YAML_CONTAINER_PORT>>
+              path: https://<<YAML_HOST>>/api/healthcheck/status
+              port: 80
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 720  
