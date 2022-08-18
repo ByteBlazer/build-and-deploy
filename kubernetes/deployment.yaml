@@ -28,14 +28,14 @@ spec:
               - curl 'https://<<YAML_HOST>>/api/healthcheck/status'|grep STATUS-OK || curl 'http://localhost:<<YAML_CONTAINER_PORT>>/api/healthcheck/status'|grep STATUS-OK
             initialDelaySeconds: 10
             periodSeconds: 10
-            failureThreshold: 720
+            failureThreshold: 1
           livenessProbe:
             exec:
               command: 
               - /bin/sh
               - -c
               - curl 'https://<<YAML_HOST>>/api/healthcheck/status'|grep STATUS-OK || curl 'http://localhost:<<YAML_CONTAINER_PORT>>/api/healthcheck/status'|grep STATUS-OK
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            failureThreshold: 720  
+            initialDelaySeconds: 3600
+            periodSeconds: 60
+            failureThreshold: 15
 ---
