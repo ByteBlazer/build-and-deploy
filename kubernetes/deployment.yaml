@@ -21,16 +21,20 @@ spec:
           ports:
             - containerPort: <<YAML_CONTAINER_PORT>>
           readinessProbe:
-            httpGet: 
-              path: https://<<YAML_HOST>>/api/healthcheck/status
-              port: 80
+            exec:
+              command: 
+              - sh
+              - -c
+              - curl 'https://<<YAML_HOST>>/api/healthcheck/status'|grep STATUS-OK
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 720
           livenessProbe:
-            httpGet: 
-              path: https://<<YAML_HOST>>/api/healthcheck/status
-              port: 80
+            exec:
+              command: 
+              - /bin/sh
+              - -c
+              - curl 'https://<<YAML_HOST>>/api/healthcheck/status'|grep STATUS-OK
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 720  
