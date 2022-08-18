@@ -27,6 +27,7 @@ on:
       angularApp:
         required: false
         type: boolean
+        default: false
       backendApiContextPath:
         required: false
         type: string
@@ -96,7 +97,7 @@ jobs:
           repository: ByteBlazer/build-and-deploy
           path: "./build-and-deloy-repo"
       - name: ReplaceTokensInAngularEnvironmentFiles
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true'}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         uses: cschleiden/replace-tokens@v1
         with:
           tokenPrefix: "<<"
@@ -106,7 +107,7 @@ jobs:
           BACKEND_APP_HOST_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           BACKEND_APP_BASE_CONTEXT: ${{fromJson(steps.EvaluateParams.outputs.result).backendApiContextPath}}
       - name: DEBUG-ViewAngularEnvFiles
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true'}}
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           echo "\n**************************************************************************\n"
           cat src/environments/environment.prod.ts
