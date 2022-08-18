@@ -26,4 +26,5 @@ spec:
               port: <<YAML_CONTAINER_PORT>>
             initialDelaySeconds: 10
             periodSeconds: 10
+            failureThreshold: 720
 ---
