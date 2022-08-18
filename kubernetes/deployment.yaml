@@ -20,11 +20,11 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: <<YAML_CONTAINER_PORT>>
-          readinessProbe:
-            httpGet: 
-              path: <<YAML_PATH_PATTERN>>healthcheck/status
-              port: <<YAML_CONTAINER_PORT>>
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            failureThreshold: 720
+          #readinessProbe:
+          #  httpGet: 
+          #    path: <<YAML_PATH_PATTERN>>healthcheck/status
+          #    port: <<YAML_CONTAINER_PORT>>
+          #  initialDelaySeconds: 10
+          # periodSeconds: 10
+          #  failureThreshold: 720
 ---
