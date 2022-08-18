@@ -23,7 +23,7 @@ spec:
           readinessProbe:
             exec:
               command: 
-              - sh
+              - /bin/sh
               - -c
               - curl 'https://<<YAML_HOST>>/api/healthcheck/status'|grep STATUS-OK
             initialDelaySeconds: 10
