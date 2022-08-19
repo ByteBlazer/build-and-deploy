@@ -23,7 +23,8 @@ spec:
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "<<YAML_HASH_BASED_DB_PASSWORD>>"
-          args: ["--default-authentication-plugin=mysql_native_password"]
+          args:
+            - "--default-authentication-plugin=mysql_native_password"
           ports:
             - containerPort: <<YAML_CONTAINER_PORT>>
               name: mysql    
