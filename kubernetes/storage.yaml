@@ -17,5 +17,4 @@ metadata:
 data: 
   init-script.sql: |-
     CREATE DATABASE IF NOT EXISTS <<YAML_DB_SCHEMA_NAME>>; 
-    ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY '<<YAML_HASH_BASED_DB_PASSWORD>>';
 ---
