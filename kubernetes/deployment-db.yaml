@@ -23,8 +23,6 @@ spec:
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "<<YAML_HASH_BASED_DB_PASSWORD>>"
-          args:
-            - "--default-authentication-plugin=mysql_native_password"
           ports:
             - containerPort: <<YAML_CONTAINER_PORT>>
               name: mysql    
@@ -33,6 +31,9 @@ spec:
               mountPath: /var/lib/mysql    
             - name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script
               mountPath: /docker-entrypoint-initdb.d
+            - name: <<YAML_DB_SCHEMA_NAME>>-db-auth-config-script
+              mountPath: /etc/mysql/conf.d/default_auth.cnf
+              subPath: default_auth
       volumes: 
         - name: mysql-persistent-storage
           persistentVolumeClaim:
@@ -40,4 +41,7 @@ spec:
         - name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script
           configMap:
             name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script
+        - name: <<YAML_DB_SCHEMA_NAME>>-db-auth-config-script
+          configMap:
+            name: <<YAML_DB_SCHEMA_NAME>>-db-auth-config-script
 ---
