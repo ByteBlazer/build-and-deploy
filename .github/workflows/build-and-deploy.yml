@@ -38,7 +38,7 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.ADMIN_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.ADMIN_AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_DEFAULT_REGION: ${{ secrets.ADMIN_AWS_DEFAULT_REGION }}
     steps:
       - name: CodeCheckout
         uses: actions/checkout@v3
