@@ -115,7 +115,7 @@ jobs:
       - name: ConfigureKubectlCommand
         run: |
           echo 'Configuring kubectl command to talk to EKS cluster inside corporate AWS account.......'
-          aws eks --region ${{ secrets.AWS_DEFAULT_REGION }} update-kubeconfig --name ${{ secrets.AWS_EKS_CLUSTER_NAME }}
+          aws eks --region ${{ secrets.ADMIN_AWS_DEFAULT_REGION }} update-kubeconfig --name ${{ secrets.AWS_EKS_CLUSTER_NAME }}
           echo '....configuration of kubectl command completed'
           kubectl get pods
       - name: ReplaceTokensInKubernetesDeploymentFiles
