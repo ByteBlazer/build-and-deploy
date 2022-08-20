@@ -408,6 +408,7 @@ module.exports = ({
   branchNameToBeCheckedOut = branchRefToBeCheckedOut.split('refs/heads/')[1];
 
   const resultObj = {
+    env,
     branchRefToBeCheckedOut,
     branchNameToBeCheckedOut,
     namespace,
