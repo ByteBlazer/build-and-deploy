@@ -25,7 +25,8 @@ module.exports = ({
   sisterApp
 }) => {
 
-  console.log("#################################################################"+JSON.stringify(context));
+  //console.log("#################################################################"+JSON.stringify(context));
+  
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
     let arr = str.split("");

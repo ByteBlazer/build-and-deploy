@@ -3,6 +3,10 @@
   "branchName": "<<JSON_BUILDINFO_BRANCH_NAME>>",
   "buildTime": "<<JSON_BUILDINFO_BUILD_TIME>>",
   "lastCommitMsg": "<<JSON_BUILDINFO_LAST_COMMIT_MSG>>",
-  "lastCommitURL": "<<JSON_BUILDINFO_LAST_COMMIT_URL>>",
-  "releaseSqlScriptsChanged": "<<JSON_BUILDINFO_RELEASE_SQL_SCRIPTS_CHANGED>>"
+  "lastCommitDate": "<<JSON_BUILDINFO_LAST_COMMIT_DATE>>",
+  "lastCommitterName": "<<JSON_BUILDINFO_LAST_COMMITTER_NAME>>",
+  "committerLogin": "<<JSON_BUILDINFO_LAST_COMMITTER_LOGIN>>",
+  "lastCommitUrl": "<<JSON_BUILDINFO_LAST_COMMIT_URL>>",
+  "lastCommitFiles": "<<JSON_BUILDINFO_LAST_COMMIT_FILES>>",
+  "releaseSqlScriptsModified": "<<JSON_BUILDINFO_RELEASE_SQL_SCRIPTS_MODIFIED>>"
 }

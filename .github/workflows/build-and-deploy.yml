@@ -69,6 +69,26 @@ jobs:
           script: |
             const script = require('./build-and-deloy-repo/js/script.js');
             return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerMilliseconds:"${{github.event.client_payload.fastForwardServerMilliseconds}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
+      - name: GetLastCommitInfo
+        id: GetLastCommitInfo
+        run: |
+          curl --location --request GET '${{fromJson(steps.EvaluateParams.outputs.result).githubBranchesApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o appBranches.json
+          lastCommitUrl="$(cat appBranches.json | jq -r '.[] | select(.name=="${{github.event.client_payload.branchNameToBeCheckedOut}}") | .commit.url')"  
+          curl --location --request GET $lastCommitUrl --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o commitInfo.json
+          commitMessage="$(cat commitInfo.json|jq -r .commit.message)"
+          commitDate="$(cat commitInfo.json|jq -r .commit.committer.date)"
+          committerName="$(cat commitInfo.json|jq -r .commit.committer.name)"
+          committerLogin="$(cat commitInfo.json|jq -r .committer.login)"
+          commitUrl="$(cat commitInfo.json|jq -r .html_url)"
+          commitFiles="$(cat commitInfo.json|jq -r .files[].filename | awk '{print $1}' ORS=',')"
+          releaseDbSqlScriptsModified="$(cat commitInfo.json|jq -r .files[].filename | grep release-db-scripts.sql | wc -l)"
+          echo "::set-output name=commitMessage::$commitMessage"
+          echo "::set-output name=commitDate::$commitDate"
+          echo "::set-output name=committerName::$committerName"
+          echo "::set-output name=committerLogin::$committerLogin"
+          echo "::set-output name=commitUrl::$commitUrl"
+          echo "::set-output name=commitFiles::$commitFiles"
+          echo "::set-output name=releaseDbSqlScriptsModified::$releaseDbSqlScriptsModified"
       - name: TriggerSisterAppDeploymentOrDelete
         id: TriggerSisterAppDeploymentOrDelete
         if: ${{fromJson(steps.EvaluateParams.outputs.result).triggerSisterAppInCaseCorrespondingBranchDoesNOTExist == true}}
@@ -164,7 +184,13 @@ jobs:
           JSON_BUILDINFO_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           JSON_BUILDINFO_BRANCH_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}
           JSON_BUILDINFO_BUILD_TIME: ${{fromJson(steps.EvaluateParams.outputs.result).deployTimestamp}}
-          
+          JSON_BUILDINFO_LAST_COMMIT_MSG: ${{steps.GetLastCommitInfo.outputs.commitMessage}}
+          JSON_BUILDINFO_LAST_COMMIT_DATE: ${{fromJson(steps.GetLastCommitInfo.outputs.commitDate}}
+          JSON_BUILDINFO_LAST_COMMITTER_NAME: ${{fromJson(steps.GetLastCommitInfo.outputs.committerName}}
+          JSON_BUILDINFO_LAST_COMMITTER_LOGIN: ${{fromJson(steps.GetLastCommitInfo.outputs.committerLogin}}
+          JSON_BUILDINFO_LAST_COMMIT_URL: ${{fromJson(steps.GetLastCommitInfo.outputs.commitUrl}}
+          JSON_BUILDINFO_LAST_COMMIT_FILES: ${{fromJson(steps.GetLastCommitInfo.outputs.commitFiles}}
+          JSON_BUILDINFO_RELEASE_SQL_SCRIPTS_MODIFIED: ${{fromJson(steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}}
       - name: CopyBuildInfoJsonToSourceRoot
         run: |
           cp ./build-and-deloy-repo/buildinfo.json .
