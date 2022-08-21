@@ -173,10 +173,10 @@ jobs:
           echo "\n**************************************************************************\n"
           cat build-and-deloy-repo/kubernetes/pvc.yaml
           echo "\n**************************************************************************\n"
-      - name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
-        uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
+      # - name: DockerImageLayerCaching #You can comment out this whole step. It will only disable docker image caching and will not affect anything else
+      #   if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
+      #   uses: satackey/action-docker-layer-caching@v0.0.11
+      #   continue-on-error: true
       - name: BuildAndPushDockerImage
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow ==  false}}
         run: |
