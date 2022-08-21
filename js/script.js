@@ -222,8 +222,8 @@ module.exports = ({
       "Setting branchRefToBeCheckedOut to:" + branchRefToBeCheckedOut
     );
 
-    if (context.ref == "refs/heads/main") {
-      console.log("The current branch is: main");
+    if (context.ref == "refs/heads/main" || context.ref == "refs/heads/stable") {
+      console.log("The current branch is either 'main' or 'stable'.");
       groupName = applicationName;
       env = envNameForProduction;
       serviceName = applicationName;
