@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ebs-mysql-pv-claim-<<YAML_NUMERIC_HASH_OF_HOST_AND_PORT>>
+  name: ebs-mysql-pv-claim-<<YAML_NUMERIC_HASH_OF_HOST>>
   namespace: <<YAML_NAMESPACE>>
 spec: 
   accessModes:

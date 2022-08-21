@@ -131,7 +131,7 @@ jobs:
           YAML_CONTAINER_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).containerPort}}
           YAML_SERVICE_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).serviceName}}
           YAML_SERVICE_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).servicePort}}
-          YAML_NUMERIC_HASH_OF_HOST_AND_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).numericHashOfHostAndPort}}
+          YAML_NUMERIC_HASH_OF_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).numericHashOfHost}}
           YAML_INGRESS_LB_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).ingressLbName}}
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_PATH_PATTERN: ${{fromJson(steps.EvaluateParams.outputs.result).pathPattern}}
@@ -149,7 +149,7 @@ jobs:
           YAML_CONTAINER_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).containerPortForDatabase}}
           YAML_SERVICE_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}}
           YAML_SERVICE_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).servicePortForDatabase}}
-          YAML_NUMERIC_HASH_OF_HOST_AND_PORT: ${{fromJson(steps.EvaluateParams.outputs.result).numericHashOfHostAndPortForDatabase}}
+          YAML_NUMERIC_HASH_OF_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).numericHashOfHost}}
           YAML_INGRESS_LB_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).ingressLbName}}
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_DB_SCHEMA_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).dbSchemaName}}

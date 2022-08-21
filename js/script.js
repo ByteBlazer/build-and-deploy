@@ -68,8 +68,8 @@ module.exports = ({
   let containerNameForDatabase = "NA";
   let serviceName = "NA";
   let serviceNameForDatabase = "NA";
-  let numericHashOfHostAndPort = "NA";
-  let numericHashOfHostAndPortForDatabase = "NA";
+  let numericHashOfHost = "NA";
+  
   let hashBasedDBPassword = "NA";
   let ingressLbName = "NA";
   let hostName = "NA";
@@ -319,10 +319,11 @@ module.exports = ({
     }
   }
 
-  numericHashOfHostAndPort = hash(hostName + containerPort) % 1000; //Less than 1000
-  numericHashOfHostAndPortForDatabase =
-    hash(hostName + containerPortForDatabase) % 1000; //Less than 1000
-
+  numericHashOfHost = hash(hostName) % 1000; //Less than 1000
+  if(pathPattern=="/"){
+    numericHashOfHost = numericHashOfHost + 1;
+  }
+  
   ingressLbName = "ingress-lb" + "-" + namespace;
   hashBasedDBPassword = hash(hostName) % 100000; //5 digit
 
@@ -421,8 +422,7 @@ module.exports = ({
     serviceNameForDatabase,
     servicePort,
     servicePortForDatabase,
-    numericHashOfHostAndPort,
-    numericHashOfHostAndPortForDatabase,
+    numericHashOfHost,
     ingressLbName,
     hostName,
     pathPattern,

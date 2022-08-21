@@ -37,7 +37,7 @@ spec:
       volumes: 
         - name: mysql-persistent-storage
           persistentVolumeClaim:
-            claimName: ebs-mysql-pv-claim-<<YAML_NUMERIC_HASH_OF_HOST_AND_PORT>>
+            claimName: ebs-mysql-pv-claim-<<YAML_NUMERIC_HASH_OF_HOST>>
         - name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script
           configMap:
             name: <<YAML_DB_SCHEMA_NAME>>-dbcreation-script

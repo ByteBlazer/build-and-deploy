@@ -13,7 +13,7 @@ metadata:
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     # Ingress Groups
     alb.ingress.kubernetes.io/group.name: <<YAML_NAMESPACE>>
-    alb.ingress.kubernetes.io/group.order: '<<YAML_NUMERIC_HASH_OF_HOST_AND_PORT>>'
+    alb.ingress.kubernetes.io/group.order: '<<YAML_NUMERIC_HASH_OF_HOST>>'
     # Health Check Settings 
     #alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
     #alb.ingress.kubernetes.io/healthcheck-port: traffic-port
