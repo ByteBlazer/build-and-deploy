@@ -154,6 +154,21 @@ jobs:
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_DB_SCHEMA_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).dbSchemaName}}
           YAML_HASH_BASED_DB_PASSWORD: ${{fromJson(steps.EvaluateParams.outputs.result).hashBasedDBPassword}}
+      - name: ReplaceTokensInBuildInfoJsonFile
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: "<<"
+          tokenSuffix: ">>"
+          files: '["./build-and-deloy-repo/buildinfo.json"]'
+        env:
+          JSON_BUILDINFO_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
+          JSON_BUILDINFO_BRANCH_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}
+      - name: CopyBuildInfoJsonToSourceRoot
+        run: |
+          cp ./build-and-deloy-repo/buildinfo.json .
+          echo "***********   BUILD INFO JSON   ******************"
+          cat buildinfo.json
+          echo "***********   BUILD INFO JSON   ******************"
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
           echo "\n**************************************************************************\n"
