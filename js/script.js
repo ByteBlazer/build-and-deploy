@@ -79,12 +79,14 @@ module.exports = ({
   let env = "NA";
   let githubDispatchApiEndpoint = 'NA';
   let githubBranchesApiEndpoint = 'NA';
+  let githubLastCommitApiEndpoint = 'NA';
+  let githubBranchesApiForSisterAppEndpoint = 'NA';
   let postRequestBodyJSON = 'NA';
   let triggerSisterAppInCaseCorrespondingBranchDoesNOTExist = false;
   let deleteFlow = false;
   let githubBranchesApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/branches";
 
-
+  const gitHubLastCommitApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/commits"
   const githubDispatchApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/dispatches";
   const dockerPhraseForCommonEnvVariables = "COMMON";
   const envNameForProduction = "PROD";
@@ -289,7 +291,7 @@ module.exports = ({
 
         
           //Get sister apps branches . Only if corresponding branch does not exist there, do we need to trigger
-          githubBranchesApiEndpoint = githubBranchesApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
+          githubBranchesApiForSisterAppEndpoint = githubBranchesApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
 
 
           githubDispatchApiEndpoint = githubDispatchApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
@@ -410,6 +412,13 @@ module.exports = ({
 
   branchNameToBeCheckedOut = branchRefToBeCheckedOut.split('refs/heads/')[1];
 
+  const deployTimestamp = new Date();
+
+  
+  githubBranchesApiEndpoint = githubBranchesApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',applicationName).replace('<CORP_NAME_PLACEHOLDER>',corp);
+  githubLastCommitApiEndpoint = gitHubLastCommitApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',applicationName).replace('<CORP_NAME_PLACEHOLDER>',corp);
+
+
   const resultObj = {
     env,
     branchRefToBeCheckedOut,
@@ -438,8 +447,11 @@ module.exports = ({
     triggerSisterAppInCaseCorrespondingBranchDoesNOTExist,
     githubDispatchApiEndpoint,
     githubBranchesApiEndpoint,
+    githubLastCommitApiEndpoint,
+    githubBranchesApiForSisterAppEndpoint,
     postRequestBodyJSON,
-    deleteFlow
+    deleteFlow,
+    deployTimestamp
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));

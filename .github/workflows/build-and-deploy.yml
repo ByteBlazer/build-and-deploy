@@ -73,7 +73,7 @@ jobs:
         id: TriggerSisterAppDeploymentOrDelete
         if: ${{fromJson(steps.EvaluateParams.outputs.result).triggerSisterAppInCaseCorrespondingBranchDoesNOTExist == true}}
         run: |
-          curl --location --request GET '${{fromJson(steps.EvaluateParams.outputs.result).githubBranchesApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o sisterAppBranches.json
+          curl --location --request GET '${{fromJson(steps.EvaluateParams.outputs.result).githubBranchesApiForSisterAppEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o sisterAppBranches.json
           branchExistsInSisterApp="$(cat sisterAppBranches.json | jq -r '.[].name'|awk '{print $1}' | grep '${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}' | wc -l)"
           if [ $branchExistsInSisterApp == "0" ]
           then
@@ -163,6 +163,8 @@ jobs:
         env:
           JSON_BUILDINFO_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           JSON_BUILDINFO_BRANCH_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}
+          JSON_BUILDINFO_BUILD_TIME: ${{fromJson(steps.EvaluateParams.outputs.result).deployTimestamp}}
+          
       - name: CopyBuildInfoJsonToSourceRoot
         run: |
           cp ./build-and-deloy-repo/buildinfo.json .
