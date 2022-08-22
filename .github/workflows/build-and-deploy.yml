@@ -76,9 +76,12 @@ jobs:
           lastCommitUrl="$(cat appBranches.json | jq -r '.[] | select(.name=="${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}") | .commit.url')"  
           curl --location --request GET $lastCommitUrl --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o commitInfo.json
           commitMessage="$(cat commitInfo.json|jq -r .commit.message)"
-          commitDate="$(cat commitInfo.json|jq -r .commit.author.date)"
-          committerName="$(cat commitInfo.json|jq -r .commit.author.name)"
-          committerLogin="$(cat commitInfo.json|jq -r .author.login)"
+          commitDate="$(cat commitInfo.json|jq -r .commit.committer.date)"
+          committerName="$(cat commitInfo.json|jq -r .commit.committer.name)"
+          committerLogin="$(cat commitInfo.json|jq -r .committer.login)"
+          originalCommitDate="$(cat commitInfo.json|jq -r .commit.author.date)"
+          originalCommitterName="$(cat commitInfo.json|jq -r .commit.author.name)"
+          originalCommitterLogin="$(cat commitInfo.json|jq -r .author.login)"
           commitUrl="$(cat commitInfo.json|jq -r .html_url)"
           commitFiles="$(cat commitInfo.json|jq -r .files[].filename | awk '{print $1}' ORS=',')"
           releaseDbSqlScriptsModified="$(cat commitInfo.json|jq -r .files[].filename | grep release-db-scripts.sql | wc -l)"
@@ -86,6 +89,9 @@ jobs:
           echo "::set-output name=commitDate::$commitDate"
           echo "::set-output name=committerName::$committerName"
           echo "::set-output name=committerLogin::$committerLogin"
+          echo "::set-output name=originalCommitDate::$originalCommitDate"
+          echo "::set-output name=originalCommitterName::$originalCommitterName"
+          echo "::set-output name=originalCommitterLogin::$originalCommitterLogin"
           echo "::set-output name=commitUrl::$commitUrl"
           echo "::set-output name=commitFiles::$commitFiles"
           echo "::set-output name=releaseDbSqlScriptsModified::$releaseDbSqlScriptsModified"
@@ -188,6 +194,9 @@ jobs:
           JSON_BUILDINFO_LAST_COMMIT_DATE: ${{steps.GetLastCommitInfo.outputs.commitDate}}
           JSON_BUILDINFO_LAST_COMMITTER_NAME: ${{steps.GetLastCommitInfo.outputs.committerName}}
           JSON_BUILDINFO_LAST_COMMITTER_LOGIN: ${{steps.GetLastCommitInfo.outputs.committerLogin}}
+          JSON_BUILDINFO_ORIGINAL_COMMIT_DATE: ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}
+          JSON_BUILDINFO_ORIGINAL_COMMITTER_NAME: ${{steps.GetLastCommitInfo.outputs.originalCommitterName}}
+          JSON_BUILDINFO_ORIGINAL_COMMITTER_LOGIN: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}}
           JSON_BUILDINFO_LAST_COMMIT_URL: ${{steps.GetLastCommitInfo.outputs.commitUrl}}
           JSON_BUILDINFO_LAST_COMMIT_FILES: ${{steps.GetLastCommitInfo.outputs.commitFiles}}
           JSON_BUILDINFO_RELEASE_SQL_SCRIPTS_MODIFIED: ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}}

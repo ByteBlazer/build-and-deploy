@@ -5,7 +5,10 @@
   "lastCommitMsg": "<<JSON_BUILDINFO_LAST_COMMIT_MSG>>",
   "lastCommitDate": "<<JSON_BUILDINFO_LAST_COMMIT_DATE>>",
   "lastCommitterName": "<<JSON_BUILDINFO_LAST_COMMITTER_NAME>>",
-  "committerLogin": "<<JSON_BUILDINFO_LAST_COMMITTER_LOGIN>>",
+  "lastCommitterLogin": "<<JSON_BUILDINFO_LAST_COMMITTER_LOGIN>>",
+  "originalCommitDate": "<<JSON_BUILDINFO_ORIGINAL_COMMIT_DATE>>",
+  "originalCommitterName": "<<JSON_BUILDINFO_ORIGINAL_COMMITTER_NAME>>",
+  "originalCommitterLogin": "<<JSON_BUILDINFO_ORIGINAL_COMMITTER_LOGIN>>",
   "lastCommitUrl": "<<JSON_BUILDINFO_LAST_COMMIT_URL>>",
   "lastCommitFiles": "<<JSON_BUILDINFO_LAST_COMMIT_FILES>>",
   "releaseSqlScriptsModified": "<<JSON_BUILDINFO_RELEASE_SQL_SCRIPTS_MODIFIED>>"
