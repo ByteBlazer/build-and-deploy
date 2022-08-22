@@ -99,14 +99,12 @@ jobs:
         id: SendBeginningSlackNotification
         if: ${{ always() }}
         run: |
-          contentBase="Build triggered for the application XXXXX\n\
-                      Commit Message: XXXXX\n\
-                      Triggering Commit: xxxxx XXXXX at XXXXX\n\
-                      Original Commit: xxxxx xxxxx at xxxxx\n\
-                      Commit Details Only accessible if you are a collaborator in GitHub: xxxx \n\
-                      Front end URL will be: https://XXXXXX\n\
-                      Build status as of now: ${{job.status}}"
-          content=$contentBase...BEGIN
+          content="Build triggered for the application *XXXXX*. Front end URL will be: https://XXXXX\n\
+          Commit Message: XXXXX\n\
+          Triggering Commit: xxxxx XXXXX at XXXXX\n\
+          Original Commit: xxxxx xxxxx at xxxxx\n\
+          Commit Details Only accessible if you are a collaborator in GitHub: xxxx \n\
+          Starting status as of now: *${{job.status}}*. Expect another update in around 5-10 minutes..."
           messageJson={\""text\"":\""$content\""}
           curl -d "$messageJson" --request POST '${{secrets.SLACK_WEBHOOK_URL}}'
       - name: TriggerSisterAppDeploymentOrDelete
