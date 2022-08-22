@@ -100,11 +100,12 @@ jobs:
         if: ${{ always() }}
         run: |
           content="****************************************************************\n\
-          Build triggered for the application *XXXXX*. Front end URL will be: https://XXXXX\n\
-          Commit Message: XXXXX\n\
-          Triggering Commit: xxxxx XXXXX at XXXXX\n\
-          Original Commit: xxxxx xxxxx at xxxxx\n\
-          Commit Details (Only accessible if you are a collaborator in GitHub): xxxx \n\
+          Build & Deployment triggered for the application *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}*. Front end URL will be: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
+          GitHub branch of ${{fromJson(steps.EvaluateParams.outputs.result).applicationName}} application from which the source code will be taken for this build: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}} \n\
+          Commit Message: ${{steps.GetLastCommitInfo.outputs.commitMessage}}\n\
+          Triggering Commit: ${{steps.GetLastCommitInfo.outputs.committerLogin}}(${{steps.GetLastCommitInfo.outputs.committerName}}) at ${{steps.GetLastCommitInfo.outputs.commitDate}}\n\
+          Original Commit: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}}(${{steps.GetLastCommitInfo.outputs.originalCommitterName}}) at ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}\n\
+          Commit Details (Only accessible if you are a collaborator in GitHub): ${{steps.GetLastCommitInfo.outputs.commitUrl}} \n\
           Starting status as of now: *${{job.status}}*. Expect another update in around 5-10 minutes...\n\
           ****************************************************************"
           messageJson={\""text\"":\""$content\""}

@@ -422,6 +422,7 @@ module.exports = ({
 
   const resultObj = {
     env,
+    applicationName,
     branchRefToBeCheckedOut,
     branchNameToBeCheckedOut,
     namespace,
