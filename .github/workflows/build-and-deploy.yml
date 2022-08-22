@@ -203,9 +203,9 @@ jobs:
       - name: CopyBuildInfoJsonToSourceRoot
         run: |
           cp ./build-and-deloy-repo/buildinfo.json .
-          echo "***********   BUILD INFO JSON   ******************"
+          echo "***********   BUILD INFO JSON   *******************"
           cat buildinfo.json
-          echo "***********   BUILD INFO JSON   ******************"
+          echo "***********   BUILD INFO JSON   *******************"
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
           echo "\n**************************************************************************\n"
