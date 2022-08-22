@@ -95,6 +95,14 @@ jobs:
           echo "::set-output name=commitUrl::$commitUrl"
           echo "::set-output name=commitFiles::$commitFiles"
           echo "::set-output name=releaseDbSqlScriptsModified::$releaseDbSqlScriptsModified"
+      - name: SendBeginningSlackNotification
+        id: SendBeginningSlackNotification
+        if: ${{ always() }}
+        run: |
+          contentBase='MyBuild'
+          content='$contentBase...BEGIN'
+          messageJson='{"text":"$content"}'
+          curl -d '${messageJson}' --request POST '${{secrets.SLACK_WEBHOOK_URL}}'
       - name: TriggerSisterAppDeploymentOrDelete
         id: TriggerSisterAppDeploymentOrDelete
         if: ${{fromJson(steps.EvaluateParams.outputs.result).triggerSisterAppInCaseCorrespondingBranchDoesNOTExist == true}}
