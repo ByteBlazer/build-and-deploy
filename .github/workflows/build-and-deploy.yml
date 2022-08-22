@@ -97,9 +97,9 @@ jobs:
           echo "::set-output name=releaseDbSqlScriptsModified::$releaseDbSqlScriptsModified"
       - name: SendBeginningSlackNotification
         id: SendBeginningSlackNotification
-        if: ${{ always() }}
+        if: ${{always() && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
-          content="****************************************************************\n\
+          content="***********************  BEGIN MESSAGE  ********************************\n\
           Build & Deployment triggered for the application *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}*. Target Domain: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
           GitHub branch of *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}* application from which the source code will be taken for this build: *${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}* \n\
           Commit Message: *${{steps.GetLastCommitInfo.outputs.commitMessage}}*\n\
@@ -107,7 +107,7 @@ jobs:
           Original Commit: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}} (${{steps.GetLastCommitInfo.outputs.originalCommitterName}}) at ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}\n\
           Commit Details (Only accessible if you are a collaborator in GitHub): ${{steps.GetLastCommitInfo.outputs.commitUrl}} \n\
           The job start status is: *${{job.status}}*. Expect another update about end status in around 5-10 minutes...\n\
-          ****************************************************************"
+          ***************************  END MESSAGE  ******************************"
           messageJson={\""text\"":\""$content\""}
           curl -d "$messageJson" --request POST '${{secrets.SLACK_WEBHOOK_URL}}'
       - name: TriggerSisterAppDeploymentOrDelete
@@ -286,9 +286,9 @@ jobs:
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
       - name: SendEndingSlackNotification
         id: SendEndingSlackNotification
-        if: ${{ always() }}
+        if: ${{always() && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
-          content="****************************************************************\n\
+          content="***********************  BEGIN MESSAGE ********************************\n\
           Build & Deployment ended for the application *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}*. Target Domain: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
           GitHub branch of *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}* application from which the source code was taken for this build: *${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}* \n\
           Commit Message: *${{steps.GetLastCommitInfo.outputs.commitMessage}}*\n\
@@ -298,19 +298,19 @@ jobs:
           The process ended with a status of : *${{job.status}}*. \n"
           if [ ${{job.status}} == 'cancelled' ]
           then
-            content="$content\n\n *If this is a front-end-ui-ONLY deployment:*\n\
+            content="$content\n\n  *If this is a front-end-ui-ONLY deployment:*\n\
             The application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
             \n\
             *If this is a front-end deployment, and a back-end api deployment was also triggered simultaneously:*\n\
-            Please check the status of the back-end build which will show up separately in this Slack channel.\n\
+            Please check the status of the back-end build which shows up separately in this Slack channel.\n\
             \n\
             *If this is a back-end api deployment:*\n\
-            The application server will be started now...
+            The application server startup will be attempted now...
             If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n\
-            If this is an existing feature branch, the server startup should take only 5-10 minutes.\n\
-            Please wait for a separate notification in this Slack channel, which will be sent after the back-end application server starts up ......\n" 
+            If this is an existing branch, the server startup should take only a few minutes.\n\
+            Please wait for a separate notification in this Slack channel, which will get sent after the application server starts up ......\n" 
           fi
-          content="$content\n****************************************************************\n"
+          content="$content\n*************************  END MESSAGE ********************************\n"
           messageJson={\""text\"":\""$content\""}
           curl -d "$messageJson" --request POST '${{secrets.SLACK_WEBHOOK_URL}}'
       
