@@ -101,9 +101,9 @@ jobs:
         run: |
           contentBase=Build triggered for the application XXXXX\n\
                       Commit Message: XXXXX\n\
-                      Triggering Commit: xxxxx (XXXXX) at XXXXX\n\
-                      Original Commit: xxxxx (xxxxx) at xxxxx\n\
-                      Commit Details (Only accessible if you are a collaborator in GitHub): xxxx \n\
+                      Triggering Commit: xxxxx XXXXX at XXXXX\n\
+                      Original Commit: xxxxx xxxxx at xxxxx\n\
+                      Commit Details Only accessible if you are a collaborator in GitHub: xxxx \n\
                       Front end URL will be: https://XXXXXX\n\
                       Build status as of now: ${{job.status}}
           content=$contentBase...BEGIN
