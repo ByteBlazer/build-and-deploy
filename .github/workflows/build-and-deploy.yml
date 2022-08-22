@@ -101,10 +101,10 @@ jobs:
         run: |
           content="****************************************************************\n\
           Build & Deployment triggered for the application *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}*. Front end URL will be: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
-          GitHub branch of ${{fromJson(steps.EvaluateParams.outputs.result).applicationName}} application from which the source code will be taken for this build: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}} \n\
-          Commit Message: ${{steps.GetLastCommitInfo.outputs.commitMessage}}\n\
-          Triggering Commit: ${{steps.GetLastCommitInfo.outputs.committerLogin}}(${{steps.GetLastCommitInfo.outputs.committerName}}) at ${{steps.GetLastCommitInfo.outputs.commitDate}}\n\
-          Original Commit: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}}(${{steps.GetLastCommitInfo.outputs.originalCommitterName}}) at ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}\n\
+          GitHub branch of *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}* application from which the source code will be taken for this build: *${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}* \n\
+          Commit Message: *${{steps.GetLastCommitInfo.outputs.commitMessage}}*\n\
+          Triggering Commit: ${{steps.GetLastCommitInfo.outputs.committerLogin}} (${{steps.GetLastCommitInfo.outputs.committerName}}) at ${{steps.GetLastCommitInfo.outputs.commitDate}}\n\
+          Original Commit: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}} (${{steps.GetLastCommitInfo.outputs.originalCommitterName}}) at ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}\n\
           Commit Details (Only accessible if you are a collaborator in GitHub): ${{steps.GetLastCommitInfo.outputs.commitUrl}} \n\
           Starting status as of now: *${{job.status}}*. Expect another update in around 5-10 minutes...\n\
           ****************************************************************"
@@ -284,3 +284,32 @@ jobs:
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           kubectl rollout restart deployment/${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
+      - name: SendEndingSlackNotification
+        id: SendEndingSlackNotification
+        if: ${{ always() }}
+        run: |
+          content="****************************************************************\n\
+          Build & Deployment ended for the application *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}*.\n\
+          GitHub branch of *${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}* application from which the source code was taken for this build: *${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}* \n\
+          Commit Message: *${{steps.GetLastCommitInfo.outputs.commitMessage}}*\n\
+          Triggering Commit: ${{steps.GetLastCommitInfo.outputs.committerLogin}} (${{steps.GetLastCommitInfo.outputs.committerName}}) at ${{steps.GetLastCommitInfo.outputs.commitDate}}\n\
+          Original Commit: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}} (${{steps.GetLastCommitInfo.outputs.originalCommitterName}}) at ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}\n\
+          Commit Details (Only accessible if you are a collaborator in GitHub): ${{steps.GetLastCommitInfo.outputs.commitUrl}} \n\
+          The process ended with a status of : *${{job.status}}*. \n"
+          if [ ${{job.status}} == 'success' ]
+          then
+            content="$content\n\n*If this is a front-end-ONLY deployment:*\n\
+            The application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
+            \n\
+            *If this is a front-end deployment, and a back-end deployment was also triggered simultaneously:*\n\
+            Please check the status of the back-end build which will show up separately in this same Slack channel.\n\
+            \n\
+            *If this is a back-end deployment:*\n\
+            If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delayed DNS propagation\n\
+            If this is an existing feature branch, the server startup should take only 5-10 minutes.\n\
+            Please wait for a separate notification in this Slack channel, which will be sent after the back-end application server starts up ...... " 
+          fi
+          content="$content****************************************************************\n"
+          messageJson={\""text\"":\""$content\""}
+          curl -d "$messageJson" --request POST '${{secrets.SLACK_WEBHOOK_URL}}'
+      
