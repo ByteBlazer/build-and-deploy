@@ -71,6 +71,7 @@ jobs:
             return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerMilliseconds:"${{github.event.client_payload.fastForwardServerMilliseconds}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
       - name: GetLastCommitInfo
         id: GetLastCommitInfo
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           curl --location --request GET '${{fromJson(steps.EvaluateParams.outputs.result).githubBranchesApiEndpoint}}' --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o appBranches.json
           lastCommitUrl="$(cat appBranches.json | jq -r '.[] | select(.name=="${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}") | .commit.url')"  
@@ -196,6 +197,7 @@ jobs:
           YAML_DB_SCHEMA_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).dbSchemaName}}
           YAML_HASH_BASED_DB_PASSWORD: ${{fromJson(steps.EvaluateParams.outputs.result).hashBasedDBPassword}}
       - name: ReplaceTokensInBuildInfoJsonFile
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         uses: cschleiden/replace-tokens@v1
         with:
           tokenPrefix: "<<"
@@ -216,6 +218,7 @@ jobs:
           JSON_BUILDINFO_LAST_COMMIT_FILES: ${{steps.GetLastCommitInfo.outputs.commitFiles}}
           JSON_BUILDINFO_RELEASE_SQL_SCRIPTS_MODIFIED: ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}}
       - name: CopyBuildInfoJsonToSourceRoot
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           cp ./build-and-deloy-repo/buildinfo.json .
           echo "***********   BUILD INFO JSON   *******************"
