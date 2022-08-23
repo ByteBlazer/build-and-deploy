@@ -310,6 +310,15 @@ jobs:
             *If this is a back-end api deployment:*\n\
             The application server startup will be attempted now...\n\
             If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n\
-            If this is an existing branch, the server startup should take only a few minutes.\n"
+            If this is an existing branch, the server startup should take only a few minutes.\n\"
+            if [ ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}} == 0 ]
+            then      
+              content="$content\n\nNOTE: This commit involves a change in the db release delta scripts.\n\
+              During server startup, the existing data will be wiped out and the latest data dump from the AWS S3 bucket will get loaded.\n\
+              On top of that, the delta scripts will also be executed.\n\
+              Please wait for a separate notification in this Slack channel ......\n" 
+            fi
           fi
           content="$content\n*************************  END MESSAGE ********************************\n"
+          messageJson={\""text\"":\""$content\""}
+          curl -d "$messageJson" --request POST '${{secrets.SLACK_WEBHOOK_URL}}'
