@@ -320,6 +320,6 @@ jobs:
             fi
           fi
           content="$content\n*************************  END MESSAGE ********************************\n"
-          messageJson={\""text\"":\""$content\""}
-          curl -d "$messageJson" --request POST '${{secrets.SLACK_WEBHOOK_URL}}'
+          #messageJson={\""text\"":\""$content\""}
+          #curl -d "$messageJson" --request POST '${{secrets.SLACK_WEBHOOK_URL}}'
       
