@@ -299,7 +299,7 @@ jobs:
           Original Commit: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}} (${{steps.GetLastCommitInfo.outputs.originalCommitterName}}) at ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}\n\
           Commit Details (Only accessible if you are a collaborator in GitHub): ${{steps.GetLastCommitInfo.outputs.commitUrl}} \n\
           The process ended with a status of : *${{job.status}}*. \n"
-          if [ ${{job.status}} == 'cancelled' ]
+          if [ ${{job.status}} == 'success' ]
           then
             content="$content\n\n  *If this is a front-end-ui-ONLY deployment:*\n\
             The application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
