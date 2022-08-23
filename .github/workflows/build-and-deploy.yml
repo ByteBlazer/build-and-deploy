@@ -106,7 +106,7 @@ jobs:
           Commit Message: *${{steps.GetLastCommitInfo.outputs.commitMessage}}*\n\
           Triggering Commit: ${{steps.GetLastCommitInfo.outputs.committerLogin}} (${{steps.GetLastCommitInfo.outputs.committerName}}) at ${{steps.GetLastCommitInfo.outputs.commitDate}}\n\
           Original Commit: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}} (${{steps.GetLastCommitInfo.outputs.originalCommitterName}}) at ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}\n\
-          Commit Details (Only accessible if you are a collaborator in GitHub): ${{steps.GetLastCommitInfo.outputs.commitUrl}} \n\
+          Commit Details : ${{steps.GetLastCommitInfo.outputs.commitUrl}} (Only accessible if you are added as a collaborator in GitHub)\n\
           The job start status is: *${{job.status}}*. Expect another update about end status in around 5-10 minutes...\n\
           ***************************  END MESSAGE  ******************************"
           messageJson={\""text\"":\""$content\""}
@@ -299,4 +299,17 @@ jobs:
           Original Commit: ${{steps.GetLastCommitInfo.outputs.originalCommitterLogin}} (${{steps.GetLastCommitInfo.outputs.originalCommitterName}}) at ${{steps.GetLastCommitInfo.outputs.originalCommitDate}}\n\
           Commit Details (Only accessible if you are a collaborator in GitHub): ${{steps.GetLastCommitInfo.outputs.commitUrl}} \n\
           The process ended with a status of : *${{job.status}}*. \n"
+          if [ ${{job.status}} == 'cancelled' ]
+          then
+            content="$content\n\n  *If this is a front-end-ui-ONLY deployment:*\n\
+            The application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
+            \n\
+            *If this is a front-end deployment, and a back-end api deployment was also triggered simultaneously:*\n\
+            Please check the status of the back-end build which shows up separately in this Slack channel.\n\
+            \n\
+            *If this is a back-end api deployment:*\n\
+            The application server startup will be attempted now...\n\
+            If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n\
+            If this is an existing branch, the server startup should take only a few minutes.\n\"
+          fi
           content="$content\n*************************  END MESSAGE ********************************\n"
