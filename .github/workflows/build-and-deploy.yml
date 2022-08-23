@@ -312,7 +312,7 @@ jobs:
             If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n\
             If this is an existing branch, the server startup should take only a few minutes.\n\
             The front-end URL will be: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}"
-            if [ (${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}} == 1) && ("${{fromJson(steps.EvaluateParams.outputs.result).env}}" != "${{ secrets.K8S_PRODUCTION_NAMESPACE }}") ]
+            if [ ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}} == 1 ] && [ "${{fromJson(steps.EvaluateParams.outputs.result).env}}" != "${{ secrets.K8S_PRODUCTION_NAMESPACE }}" ]
             then      
               content="$content\n\nNOTE: This commit involves a change in the db release delta scripts.\n\
               During server startup, the existing data will be wiped out and the latest data dump from the AWS S3 bucket will get loaded.\n\
