@@ -310,6 +310,6 @@ jobs:
             *If this is a back-end api deployment:*\n\
             The application server startup will be attempted now...\n\
             If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n\
-            If this is an existing branch, the server startup should take only a few minutes.\n\"
+            If this is an existing branch, the server startup should take only a few minutes.\n"
           fi
           content="$content\n*************************  END MESSAGE ********************************\n"
