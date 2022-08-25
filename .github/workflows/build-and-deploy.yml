@@ -148,6 +148,7 @@ jobs:
         env:
           BACKEND_APP_HOST_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           BACKEND_APP_BASE_CONTEXT: ${{fromJson(steps.EvaluateParams.outputs.result).backendApiContextPath}}
+          APP_ENV: ${{fromJson(steps.EvaluateParams.outputs.result).env}}
       - name: DEBUG-ViewAngularEnvFiles
         if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
