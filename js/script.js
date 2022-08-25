@@ -22,11 +22,10 @@ module.exports = ({
   backendApiContextPath,
   numberOfApplicationReplicas,
   needsDatabase,
-  sisterApp
+  sisterApp,
 }) => {
-
   //console.log("#################################################################"+JSON.stringify(context));
-  
+
   //Lifted from Google. Don't bother how it works. Just hashes a string and return a positive number.
   const hash = (str) => {
     let arr = str.split("");
@@ -43,7 +42,6 @@ module.exports = ({
   };
 
   const dockerEnvVarPrefix = "DOCKER_ENV_VAR";
-  
 
   let numberOfReplicas = numberOfApplicationReplicas;
   let dbPodNeedsToBeDeployed = needsDatabase;
@@ -72,23 +70,26 @@ module.exports = ({
   let serviceName = "NA";
   let serviceNameForDatabase = "NA";
   let numericHashOfHost = "NA";
-  
+
   let hashBasedDBPassword = "NA";
   let ingressLbName = "NA";
   let hostName = "NA";
   let dockerImageNameAndTag = "NA";
   let env = "NA";
-  let githubDispatchApiEndpoint = 'NA';
-  let githubBranchesApiEndpoint = 'NA';
-  let githubLastCommitApiEndpoint = 'NA';
-  let githubBranchesApiForSisterAppEndpoint = 'NA';
-  let postRequestBodyJSON = 'NA';
+  let githubDispatchApiEndpoint = "NA";
+  let githubBranchesApiEndpoint = "NA";
+  let githubLastCommitApiEndpoint = "NA";
+  let githubBranchesApiForSisterAppEndpoint = "NA";
+  let postRequestBodyJSON = "NA";
   let triggerSisterAppInCaseCorrespondingBranchDoesNOTExist = false;
   let deleteFlow = false;
-  let githubBranchesApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/branches";
+  let githubBranchesApiUrlTemplate =
+    "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/branches";
 
-  const gitHubLastCommitApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/commits"
-  const githubDispatchApiUrlTemplate = "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/dispatches";
+  const gitHubLastCommitApiUrlTemplate =
+    "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/commits";
+  const githubDispatchApiUrlTemplate =
+    "https://api.github.com/repos/<CORP_NAME_PLACEHOLDER>/<APP_NAME_PLACEHOLDER>/dispatches";
   const dockerPhraseForCommonEnvVariables = "COMMON";
   const envNameForProduction = "PROD";
   const envNameForTest = "TEST";
@@ -99,25 +100,29 @@ module.exports = ({
   const dockerEnvBaseVarKeyNameForDBPassword = "DB_PASSWORD";
   const baseVarKeyNameForDBShowSql = "DB_SHOWSQL";
   const baseVarKeyNameForDBSchema = "DB_SCHEMA";
+  const baseVarKeyNameForHost = "HOST";
 
   containerName = applicationName;
   containerNameForDatabase = applicationNameForDatabase;
 
-  if (context.eventName == "delete"){
-    console.log("This is a delete event trigger. Only feature branch delete events reach here. SO if we have reached here, confirmed that it was a feature branch deletion.");
-    context.ref = 'refs/heads/'+context.payload.ref;
-    deleteFlow=true;
+  if (context.eventName == "delete") {
+    console.log(
+      "This is a delete event trigger. Only feature branch delete events reach here. SO if we have reached here, confirmed that it was a feature branch deletion."
+    );
+    context.ref = "refs/heads/" + context.payload.ref;
+    deleteFlow = true;
     console.log(context.ref);
   }
-  
 
   if (context.eventName == "repository_dispatch") {
     console.log("This run is because of a respository_dispatch event");
 
-    if (triggeredByBranchDeleteEvent == "true"){
-      console.log("The parent app was deleted. So this app being the sister app should also get deleted.");
-      context.ref = 'refs/heads/feature/'+featureBranchName;
-      deleteFlow=true;
+    if (triggeredByBranchDeleteEvent == "true") {
+      console.log(
+        "The parent app was deleted. So this app being the sister app should also get deleted."
+      );
+      context.ref = "refs/heads/feature/" + featureBranchName;
+      deleteFlow = true;
       console.log(context.ref);
     }
 
@@ -220,14 +225,17 @@ module.exports = ({
       "This run is an automated run which got triggered. Could have happened due to a lot of github events on the code repo."
     );
 
-    console.log('Will use the code from incoming branch itself.');
+    console.log("Will use the code from incoming branch itself.");
 
     branchRefToBeCheckedOut = context.ref;
     console.log(
       "Setting branchRefToBeCheckedOut to:" + branchRefToBeCheckedOut
     );
 
-    if (context.ref == "refs/heads/main" || context.ref == "refs/heads/stable") {
+    if (
+      context.ref == "refs/heads/main" ||
+      context.ref == "refs/heads/stable"
+    ) {
       console.log("The current branch is either 'main' or 'stable'.");
       groupName = applicationName;
       env = envNameForProduction;
@@ -259,8 +267,10 @@ module.exports = ({
         "The current branch is a feature branch. The prefix is feature/ and the name is:" +
           featureBranchNameExcludingPrefix
       );
-      if(featureBranchNameExcludingPrefix == 'test'){
-        throw new Error('The feature branch cannot be named as: test as this subdomain is reserved for release environment, please use another name');
+      if (featureBranchNameExcludingPrefix == "test") {
+        throw new Error(
+          "The feature branch cannot be named as: test as this subdomain is reserved for release environment, please use another name"
+        );
       }
 
       groupName = featureBranchNameExcludingPrefix;
@@ -280,55 +290,53 @@ module.exports = ({
         "Triggering the other applications also in the stack, so that the deployment can work as a whole unit independently"
       );
 
-      
-      if(sisterApp){
-
+      if (sisterApp) {
         triggerSisterAppInCaseCorrespondingBranchDoesNOTExist = true;
 
-          let triggeredByBranchDeleteEvent = false;
-          if(context.eventName == "delete"){
-            triggeredByBranchDeleteEvent = true;
-          }
+        let triggeredByBranchDeleteEvent = false;
+        if (context.eventName == "delete") {
+          triggeredByBranchDeleteEvent = true;
+        }
 
-        
-          //Get sister apps branches . Only if corresponding branch does not exist there, do we need to trigger
-          githubBranchesApiForSisterAppEndpoint = githubBranchesApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
+        //Get sister apps branches . Only if corresponding branch does not exist there, do we need to trigger
+        githubBranchesApiForSisterAppEndpoint = githubBranchesApiUrlTemplate
+          .replace("<APP_NAME_PLACEHOLDER>", sisterApp)
+          .replace("<CORP_NAME_PLACEHOLDER>", corp);
 
+        githubDispatchApiEndpoint = githubDispatchApiUrlTemplate
+          .replace("<APP_NAME_PLACEHOLDER>", sisterApp)
+          .replace("<CORP_NAME_PLACEHOLDER>", corp);
+        const postRequestBody = {
+          event_type: "ondemand",
+          client_payload: {
+            triggeredBySisterApp: true,
+            featureBranchName: featureBranchNameExcludingPrefix,
+            triggeredByBranchDeleteEvent: triggeredByBranchDeleteEvent,
 
-          githubDispatchApiEndpoint = githubDispatchApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',sisterApp).replace('<CORP_NAME_PLACEHOLDER>',corp);
-          const postRequestBody = {
-            event_type: "ondemand",
-            client_payload: {
-              triggeredBySisterApp: true,
-              featureBranchName: featureBranchNameExcludingPrefix,
-              triggeredByBranchDeleteEvent: triggeredByBranchDeleteEvent,
-  
-              humanTriggered: false,
-              triggeredBy: "",
-              phoneNumberLastFiveDigits: "",
-              fastForwardServerMilliseconds: "0",
-            },
-          };
-          postRequestBodyJSON = JSON.stringify(postRequestBody);
-          console.log(
-            "Going to trigger for sisterApp:" +
+            humanTriggered: false,
+            triggeredBy: "",
+            phoneNumberLastFiveDigits: "",
+            fastForwardServerMilliseconds: "0",
+          },
+        };
+        postRequestBodyJSON = JSON.stringify(postRequestBody);
+        console.log(
+          "Going to trigger for sisterApp:" +
             sisterApp +
-              " with endpoint as:" +
-              githubDispatchApiEndpoint +
-              " and POST request body JSON as:" +
-              postRequestBodyJSON
-          );
-        
+            " with endpoint as:" +
+            githubDispatchApiEndpoint +
+            " and POST request body JSON as:" +
+            postRequestBodyJSON
+        );
       }
-      
     }
   }
 
   numericHashOfHost = hash(hostName) % 1000; //Less than 1000
-  if(pathPattern=="/"){
+  if (pathPattern == "/") {
     numericHashOfHost = numericHashOfHost + 1;
   }
-  
+
   ingressLbName = "ingress-lb" + "-" + namespace;
   hashBasedDBPassword = hash(hostName) % 100000; //5 digit
 
@@ -387,6 +395,11 @@ module.exports = ({
     value: dbSchemaName,
   });
 
+  envKeyPairsForDockerBuild.push({
+    key: baseVarKeyNameForHost,
+    value: hostName,
+  });
+
   console.log(
     "Length of Docker env variables list to be applied to docker build:" +
       envKeyPairsForDockerBuild.length
@@ -411,14 +424,16 @@ module.exports = ({
       buildArgsCommandLineArgsForDockerBuild
   );
 
-  branchNameToBeCheckedOut = branchRefToBeCheckedOut.split('refs/heads/')[1];
+  branchNameToBeCheckedOut = branchRefToBeCheckedOut.split("refs/heads/")[1];
 
   const deployTimestamp = new Date();
 
-  
-  githubBranchesApiEndpoint = githubBranchesApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',applicationName).replace('<CORP_NAME_PLACEHOLDER>',corp);
-  githubLastCommitApiEndpoint = gitHubLastCommitApiUrlTemplate.replace('<APP_NAME_PLACEHOLDER>',applicationName).replace('<CORP_NAME_PLACEHOLDER>',corp);
-
+  githubBranchesApiEndpoint = githubBranchesApiUrlTemplate
+    .replace("<APP_NAME_PLACEHOLDER>", applicationName)
+    .replace("<CORP_NAME_PLACEHOLDER>", corp);
+  githubLastCommitApiEndpoint = gitHubLastCommitApiUrlTemplate
+    .replace("<APP_NAME_PLACEHOLDER>", applicationName)
+    .replace("<CORP_NAME_PLACEHOLDER>", corp);
 
   const resultObj = {
     env,
@@ -453,7 +468,7 @@ module.exports = ({
     githubBranchesApiForSisterAppEndpoint,
     postRequestBodyJSON,
     deleteFlow,
-    deployTimestamp
+    deployTimestamp,
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));
