@@ -198,6 +198,8 @@ jobs:
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_DB_SCHEMA_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).dbSchemaName}}
           YAML_HASH_BASED_DB_PASSWORD: ${{fromJson(steps.EvaluateParams.outputs.result).hashBasedDBPassword}}
+          YAML_DATABASE_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).databaseDockerImageNameAndTag}}
+          YAML_FAST_FORWARD_NUMBER_OF_DAYS: ${{fromJson(steps.EvaluateParams.outputs.result).fastForwardNumOfDays}}
       - name: ReplaceTokensInBuildInfoJsonFile
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         uses: cschleiden/replace-tokens@v1

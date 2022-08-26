@@ -71,10 +71,12 @@ module.exports = ({
   let serviceNameForDatabase = "NA";
   let numericHashOfHost = "NA";
 
+  let fastForwardNumOfDays = "+20d";//TODO: Read this from on demand dispatch json input
   let hashBasedDBPassword = "NA";
   let ingressLbName = "NA";
   let hostName = "NA";
   let dockerImageNameAndTag = "NA";
+  let databaseDockerImageNameAndTag = "NA";
   let env = "NA";
   let githubDispatchApiEndpoint = "NA";
   let githubBranchesApiEndpoint = "NA";
@@ -94,6 +96,8 @@ module.exports = ({
   const envNameForProduction = "PROD";
   const envNameForTest = "TEST";
   const envNameForLightWeight = "LIGHTWEIGHT";
+
+  databaseDockerImageNameAndTag = corp + "/" + "mysql";
 
   const dockerEnvBaseVarKeyNameForDBHost = "DB_HOST";
   const dockerEnvBaseVarKeyNameForDBUsername = "DB_USERNAME";
@@ -457,6 +461,8 @@ module.exports = ({
     angularApp,
     backendApiContextPath,
     dockerImageNameAndTag,
+    databaseDockerImageNameAndTag,
+    fastForwardNumOfDays,
     dbSchemaName,
     hashBasedDBPassword,
     buildArgsCommandLineArgsForDockerBuild,
