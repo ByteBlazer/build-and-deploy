@@ -7,7 +7,7 @@ module.exports = ({
   featureBranchName,
   triggeredBy,
   phoneNumberLastFiveDigits,
-  fastForwardServerMilliseconds, //TODO: To be used in future
+  fastForwardServerDays,
   corp,
   nameOfLightweightNamespace,
   nameOfTestNamespace,
@@ -71,7 +71,6 @@ module.exports = ({
   let serviceNameForDatabase = "NA";
   let numericHashOfHost = "NA";
 
-  let fastForwardNumOfDays = "+20d";//TODO: Read this from on demand dispatch json input
   let hashBasedDBPassword = "NA";
   let ingressLbName = "NA";
   let hostName = "NA";
@@ -198,6 +197,13 @@ module.exports = ({
           "The properties:- triggeredBy and phoneNumberLastFiveDigits must be set"
         );
       }
+      if(!fastForwardServerDays ||  !fastForwardServerDays.startsWith('+') || !fastForwardServerDays.endsWith('d')){
+        throw new Error(
+          "The fastForwardServerDays attribute should be present and should be of the format:a plus sign, a number and then the letter-d. Examples: +0d, +5d , +105d, +20d etc..."
+        );
+      }
+
+
       groupName = triggeredBy + "-" + phoneNumberLastFiveDigits;
       env = envNameForLightWeight;
 
@@ -310,6 +316,8 @@ module.exports = ({
         githubDispatchApiEndpoint = githubDispatchApiUrlTemplate
           .replace("<APP_NAME_PLACEHOLDER>", sisterApp)
           .replace("<CORP_NAME_PLACEHOLDER>", corp);
+        
+        
         const postRequestBody = {
           event_type: "ondemand",
           client_payload: {
@@ -320,7 +328,7 @@ module.exports = ({
             humanTriggered: false,
             triggeredBy: "",
             phoneNumberLastFiveDigits: "",
-            fastForwardServerMilliseconds: "0",
+            fastForwardServerDays: "+0d",
           },
         };
         postRequestBodyJSON = JSON.stringify(postRequestBody);
@@ -462,7 +470,7 @@ module.exports = ({
     backendApiContextPath,
     dockerImageNameAndTag,
     databaseDockerImageNameAndTag,
-    fastForwardNumOfDays,
+    fastForwardServerDays,
     dbSchemaName,
     hashBasedDBPassword,
     buildArgsCommandLineArgsForDockerBuild,
