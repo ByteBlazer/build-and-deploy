@@ -20,6 +20,9 @@ spec:
         - name: <<YAML_CONTAINER_NAME>>
           image: <<YAML_DOCKER_IMAGE_NAME_AND_TAG>>
           imagePullPolicy: Always
+          env:
+            - name: FAKETIME
+              value: "<<YAML_FAST_FORWARD_NUMBER_OF_DAYS>>"
           ports:
             - containerPort: <<YAML_CONTAINER_PORT>>
           readinessProbe:

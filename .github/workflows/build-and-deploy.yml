@@ -180,6 +180,7 @@ jobs:
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_PATH_PATTERN: ${{fromJson(steps.EvaluateParams.outputs.result).pathPattern}}
           YAML_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}}
+          YAML_FAST_FORWARD_NUMBER_OF_DAYS: ${{fromJson(steps.EvaluateParams.outputs.result).fastForwardNumOfDays}}
       - name: ReplaceTokensInKubernetesDatabaseDeploymentFiles
         uses: cschleiden/replace-tokens@v1
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed ==  'true'}}
