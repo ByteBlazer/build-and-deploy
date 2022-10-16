@@ -58,7 +58,7 @@ jobs:
         run: |
           echo "$SECRETS_CONTEXT">secrets.json
           keyValuePairsJsonString="$(cat secrets.json | awk '{print $0}' ORS="")"
-          echo "::set-output name=keyValuePairsJsonString::$keyValuePairsJsonString"
+          echo "keyValuePairsJsonString=$keyValuePairsJsonString" >> $GITHUB_OUTPUT
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
       - name: EvaluateParams
@@ -86,16 +86,16 @@ jobs:
           commitUrl="$(cat commitInfo.json|jq -r .html_url)"
           commitFiles="$(cat commitInfo.json|jq -r .files[].filename | awk '{print $1}' ORS=',')"
           releaseDbSqlScriptsModified="$(cat commitInfo.json|jq -r .files[].filename | grep release-db-scripts.sql | wc -l)"
-          echo "::set-output name=commitMessage::$commitMessage"
-          echo "::set-output name=commitDate::$commitDate"
-          echo "::set-output name=committerName::$committerName"
-          echo "::set-output name=committerLogin::$committerLogin"
-          echo "::set-output name=originalCommitDate::$originalCommitDate"
-          echo "::set-output name=originalCommitterName::$originalCommitterName"
-          echo "::set-output name=originalCommitterLogin::$originalCommitterLogin"
-          echo "::set-output name=commitUrl::$commitUrl"
-          echo "::set-output name=commitFiles::$commitFiles"
-          echo "::set-output name=releaseDbSqlScriptsModified::$releaseDbSqlScriptsModified"
+          echo "commitMessage=$commitMessage" >> $GITHUB_OUTPUT
+          echo "commitDate=$commitDate" >> $GITHUB_OUTPUT
+          echo "committerName=$committerName" >> $GITHUB_OUTPUT
+          echo "committerLogin=$committerLogin" >> $GITHUB_OUTPUT
+          echo "originalCommitDate=$originalCommitDate" >> $GITHUB_OUTPUT
+          echo "originalCommitterName=$originalCommitterName" >> $GITHUB_OUTPUT
+          echo "originalCommitterLogin=$originalCommitterLogin" >> $GITHUB_OUTPUT
+          echo "commitUrl=$commitUrl" >> $GITHUB_OUTPUT
+          echo "commitFiles=$commitFiles" >> $GITHUB_OUTPUT
+          echo "releaseDbSqlScriptsModified=$releaseDbSqlScriptsModified" >> $GITHUB_OUTPUT
       - name: SendBeginningSlackNotification
         id: SendBeginningSlackNotification
         if: ${{always() && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
