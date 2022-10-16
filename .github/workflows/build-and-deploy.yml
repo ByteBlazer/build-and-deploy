@@ -51,7 +51,7 @@ jobs:
           gitHubBranchesUrl="$(echo '${{github.event.repository.branches_url}}'|sed 's/{\/branch}//g')";
           curl --location --request GET $gitHubBranchesUrl --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -o branches.json
           branches="$(cat branches.json | jq -r '.[].name'|awk '{print $1}' ORS=",")"
-          echo "::set-output name=branches::$branches"
+          echo "branches=$branches" >> $GITHUB_OUTPUT
       - name: view the secrets  context
         shell: bash
         id: ViewSecretKeys
