@@ -140,7 +140,7 @@ jobs:
           path: "./build-and-deloy-repo"
       - name: ReplaceTokensInAngularEnvironmentFiles
         if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
-        uses: cschleiden/replace-tokens@v1.1
+        uses: cschleiden/replace-tokens@v1.2
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
@@ -163,7 +163,7 @@ jobs:
           echo '....configuration of kubectl command completed'
           kubectl get pods
       - name: ReplaceTokensInKubernetesDeploymentFiles
-        uses: cschleiden/replace-tokens@v1.1
+        uses: cschleiden/replace-tokens@v1.2
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
@@ -182,7 +182,7 @@ jobs:
           YAML_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}}
           YAML_FAST_FORWARD_NUMBER_OF_DAYS: ${{fromJson(steps.EvaluateParams.outputs.result).fastForwardServerDays}}
       - name: ReplaceTokensInKubernetesDatabaseDeploymentFiles
-        uses: cschleiden/replace-tokens@v1.1
+        uses: cschleiden/replace-tokens@v1.2
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed ==  'true'}}
         with:
           tokenPrefix: "<<"
@@ -203,7 +203,7 @@ jobs:
           YAML_FAST_FORWARD_NUMBER_OF_DAYS: ${{fromJson(steps.EvaluateParams.outputs.result).fastForwardNumOfDays}}
       - name: ReplaceTokensInBuildInfoJsonFile
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
-        uses: cschleiden/replace-tokens@v1.1
+        uses: cschleiden/replace-tokens@v1.2
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
