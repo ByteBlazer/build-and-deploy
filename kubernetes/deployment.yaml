@@ -25,23 +25,22 @@ spec:
               value: "<<YAML_FAST_FORWARD_NUMBER_OF_DAYS>>"
           ports:
             - containerPort: <<YAML_CONTAINER_PORT>>
-          # readinessProbe:
-          #   exec:
-          #     command:
-          #     - /bin/sh
-          #     - -c
-          #     - curl 'https://<<YAML_HOST>>/api/healthcheck/status?probe=readiness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK || curl 'http://localhost:<<YAML_CONTAINER_PORT>>/api/healthcheck/status?probe=readiness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK
-          #   initialDelaySeconds: 10
-          #   periodSeconds: 10
-          #   failureThreshold: 1
-          # livenessProbe:
-          #   exec:
-          #     command:
-          #     - /bin/sh
-          #     - -c
-          #     - curl 'https://<<YAML_HOST>>/api/healthcheck/status?probe=liveness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK || curl 'http://localhost:<<YAML_CONTAINER_PORT>>/api/healthcheck/status?probe=liveness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK
-          #   initialDelaySeconds: 3600
-          #   periodSeconds: 60
-          #   failureThreshold: 15
+          readinessProbe:
+            exec:
+              command: 
+              - /bin/sh
+              - -c
+              - curl 'https://<<YAML_HOST>>/api/healthcheck/status?probe=readiness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK || curl 'http://localhost:<<YAML_CONTAINER_PORT>>/api/healthcheck/status?probe=readiness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 1
+          livenessProbe:
+            exec:
+              command: 
+              - /bin/sh
+              - -c
+              - curl 'https://<<YAML_HOST>>/api/healthcheck/status?probe=liveness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK || curl 'http://localhost:<<YAML_CONTAINER_PORT>>/api/healthcheck/status?probe=liveness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK
+            initialDelaySeconds: 3600
+            periodSeconds: 60
+            failureThreshold: 15
 ---
-
