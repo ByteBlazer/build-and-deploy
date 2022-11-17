@@ -77,6 +77,7 @@ jobs:
           cat appBranches.json
           lastCommitUrl="$(cat appBranches.json | jq -r '.[] | select(.name=="${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}") | .commit.url')"  
           curl --location --request GET $lastCommitUrl --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o commitInfo.json
+          cat commitInfo.json
           commitMessage="$(cat commitInfo.json|jq -r .commit.message)"
           commitDate="$(cat commitInfo.json|jq -r .commit.committer.date)"
           committerName="$(cat commitInfo.json|jq -r .commit.committer.name)"
