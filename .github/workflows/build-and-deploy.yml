@@ -277,8 +277,8 @@ jobs:
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
-          kubectl delete -f build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
-          kubectl apply -f build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
+          kubectl delete -f build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
+          kubectl delete -f build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
       - name: DeleteApplicationFromKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == true}}
         run: |
