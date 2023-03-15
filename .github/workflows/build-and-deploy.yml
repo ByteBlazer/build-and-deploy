@@ -87,9 +87,6 @@ jobs:
           commitFiles="$(cat commitInfo.json|jq -r .files[].filename | awk '{print $1}' ORS=',')"
           releaseDbSqlScriptsModified="$(cat commitInfo.json|jq -r .files[].filename | grep release-db-scripts.sql | wc -l)"
           echo "commitMessage=$commitMessage" >> $GITHUB_OUTPUT
-          echo "before"
-          echo $GITHUB_OUTPUT
-          echo "after"
           echo "commitDate=$commitDate" >> $GITHUB_OUTPUT
           echo "committerName=$committerName" >> $GITHUB_OUTPUT
           echo "committerLogin=$committerLogin" >> $GITHUB_OUTPUT
@@ -99,6 +96,9 @@ jobs:
           echo "commitUrl=$commitUrl" >> $GITHUB_OUTPUT
           echo "commitFiles=$commitFiles" >> $GITHUB_OUTPUT
           echo "releaseDbSqlScriptsModified=$releaseDbSqlScriptsModified" >> $GITHUB_OUTPUT
+          echo "before"
+          echo $GITHUB_OUTPUT
+          echo "after"
       - name: SendBeginningSlackNotification
         id: SendBeginningSlackNotification
         if: ${{always() && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
