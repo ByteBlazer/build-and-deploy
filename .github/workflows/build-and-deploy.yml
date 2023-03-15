@@ -86,10 +86,10 @@ jobs:
           commitUrl="$(cat commitInfo.json|jq -r .html_url)"
           commitFiles="$(cat commitInfo.json|jq -r .files[].filename | awk '{print $1}' ORS=',')"
           releaseDbSqlScriptsModified="$(cat commitInfo.json|jq -r .files[].filename | grep release-db-scripts.sql | wc -l)"
-          echo "before"
-          echo $releaseDbSqlScriptsModified
-          echo "after"
           echo "commitMessage=$commitMessage" >> $GITHUB_OUTPUT
+          echo "before"
+          echo $GITHUB_OUTPUT
+          echo "after"
           echo "commitDate=$commitDate" >> $GITHUB_OUTPUT
           echo "committerName=$committerName" >> $GITHUB_OUTPUT
           echo "committerLogin=$committerLogin" >> $GITHUB_OUTPUT
