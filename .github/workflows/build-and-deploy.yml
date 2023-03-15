@@ -77,6 +77,7 @@ jobs:
           lastCommitUrl="$(cat appBranches.json | jq -r '.[] | select(.name=="${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}") | .commit.url')"  
           curl --location --request GET $lastCommitUrl --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o commitInfo.json
           commitMessage="$(cat commitInfo.json|jq -r .commit.message)"
+          commitMessageWithLineBreaksRemoved = $(echo $commitMessage | tr '\n' ' ')
           commitDate="$(cat commitInfo.json|jq -r .commit.committer.date)"
           committerName="$(cat commitInfo.json|jq -r .commit.committer.name)"
           committerLogin="$(cat commitInfo.json|jq -r .committer.login)"
@@ -86,7 +87,7 @@ jobs:
           commitUrl="$(cat commitInfo.json|jq -r .html_url)"
           commitFiles="$(cat commitInfo.json|jq -r .files[].filename | awk '{print $1}' ORS=',')"
           releaseDbSqlScriptsModified="$(cat commitInfo.json|jq -r .files[].filename | grep release-db-scripts.sql | wc -l)"
-          echo "commitMessage=$commitMessage" >> $GITHUB_OUTPUT
+          echo "commitMessage=$commitMessageWithLineBreaksRemoved" >> $GITHUB_OUTPUT
           echo "commitDate=$commitDate" >> $GITHUB_OUTPUT
           echo "committerName=$committerName" >> $GITHUB_OUTPUT
           echo "committerLogin=$committerLogin" >> $GITHUB_OUTPUT
@@ -96,9 +97,6 @@ jobs:
           echo "commitUrl=$commitUrl" >> $GITHUB_OUTPUT
           echo "commitFiles=$commitFiles" >> $GITHUB_OUTPUT
           echo "releaseDbSqlScriptsModified=$releaseDbSqlScriptsModified" >> $GITHUB_OUTPUT
-          echo "before"
-          echo $GITHUB_OUTPUT
-          echo "after"
       - name: SendBeginningSlackNotification
         id: SendBeginningSlackNotification
         if: ${{always() && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
