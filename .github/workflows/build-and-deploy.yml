@@ -283,9 +283,9 @@ jobs:
           if [ $numberOfMatchingDbPods == 0 ]
           then
             #Hack - The DB init scripts was not getting run, so need to delete and re-created. Do this only for first time, else when you delete, you will lose all data
-            sleep 5
+            sleep 60
             kubectl delete -f build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
-            sleep 5
+            sleep 60
             kubectl apply -f build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
           fi
       - name: DeleteApplicationFromKubernetes
