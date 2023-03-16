@@ -163,6 +163,12 @@ jobs:
           aws eks --region ${{ secrets.ADMIN_AWS_DEFAULT_REGION }} update-kubeconfig --name ${{ secrets.AWS_EKS_CLUSTER_NAME }}
           echo '....configuration of kubectl command completed'
           kubectl get pods
+          numberOfMatchingDbPods=$(kubectl get pods -n ${{fromJson(steps.EvaluateParams.outputs.result).namespace}} | grep ${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} | wc -l  )
+          echo "If no matching db pods, we will delete and re-apply, we will delete. Got numberOfMatchingDbPods as $numberOfMatchingDbPods"
+          if [ $numberOfMatchingDbPods == 0 ]
+          then
+            echo "inside if"
+          fi
       - name: ReplaceTokensInKubernetesDeploymentFiles
         uses: cschleiden/replace-tokens@v1.2
         with:
