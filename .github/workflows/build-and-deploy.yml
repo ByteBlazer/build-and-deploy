@@ -163,8 +163,6 @@ jobs:
           aws eks --region ${{ secrets.ADMIN_AWS_DEFAULT_REGION }} update-kubeconfig --name ${{ secrets.AWS_EKS_CLUSTER_NAME }}
           echo '....configuration of kubectl command completed'
           kubectl get pods
-          x=$(kubectl get pods -n looper-lightweight|grep looper-db|wc -l)
-          echo "x is $x"
       - name: ReplaceTokensInKubernetesDeploymentFiles
         uses: cschleiden/replace-tokens@v1.2
         with:
@@ -279,8 +277,14 @@ jobs:
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
-          kubectl delete -f build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
-          kubectl apply -f build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
+          numberOfMatchingDbPods=$(kubectl get pods -n ${{fromJson(steps.EvaluateParams.outputs.result).namespace}} | grep ${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}} | wc -l  )
+          echo "If no matching db pods, we will delete and re-apply, we will delete. Got numberOfMatchingDbPods as $numberOfMatchingDbPods"
+          if [ $numberOfMatchingDbPods == 0 ]
+          then
+            #Bug fix. The DB init scripts was not getting run, so need to delete and re-created. Do this only for first time, else when you delete, you will lose all data
+            kubectl delete -f build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
+            kubectl apply -f build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
+          fi
       - name: DeleteApplicationFromKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == true}}
         run: |
