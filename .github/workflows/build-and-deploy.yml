@@ -164,7 +164,7 @@ jobs:
           echo '....configuration of kubectl command completed'
           kubectl get pods
           x=$(kubectl get pods -n looper-lightweight|grep looper-db|wc -l)
-          echo 'x is $x'
+          echo "x is $x"
       - name: ReplaceTokensInKubernetesDeploymentFiles
         uses: cschleiden/replace-tokens@v1.2
         with:
