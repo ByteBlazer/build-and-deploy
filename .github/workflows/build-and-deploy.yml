@@ -276,9 +276,9 @@ jobs:
       - name: DeployDatabaseToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
-          kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
           #search for pod name that starts with 'looper-db-sujith-' . If we get a valid result, it means DB pod is there already, so no need to do the hack ritual below
           numberOfMatchingDbPods=$(kubectl get pods -n ${{fromJson(steps.EvaluateParams.outputs.result).namespace}} | grep ${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}}- | wc -l  )
+          kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
           echo "If no matching db pods, we will delete and re-apply, we will delete. Got numberOfMatchingDbPods as $numberOfMatchingDbPods"
           if [ $numberOfMatchingDbPods == 0 ]
           then
