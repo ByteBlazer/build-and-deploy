@@ -25,6 +25,8 @@ spec:
               value: "<<YAML_HASH_BASED_DB_PASSWORD>>"
             - name: FAKETIME
               value: "<<YAML_FAST_FORWARD_NUMBER_OF_DAYS>>"
+            - name: TZ
+              value: Asia/Calcutta
           ports:
             - containerPort: <<YAML_CONTAINER_PORT>>
               name: mysql    
