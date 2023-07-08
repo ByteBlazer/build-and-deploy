@@ -1,7 +1,6 @@
 module.exports = ({
   github,
   context,
-  semanticVersion,
   triggeredBySisterApp,
   triggeredByBranchDeleteEvent,
   humanTriggered,
@@ -453,7 +452,6 @@ module.exports = ({
   const resultObj = {
     env,
     applicationName,
-    semanticVersion,
     branchRefToBeCheckedOut,
     branchNameToBeCheckedOut,
     namespace,
