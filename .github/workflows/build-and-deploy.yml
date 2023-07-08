@@ -237,7 +237,8 @@ jobs:
       - name: CopyBuildInfoJsonToSourceRoot
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
-          cp ./build-and-deloy-repo/buildinfo.json /usr/share/nginx/html/assets
+          cp ./build-and-deloy-repo/buildinfo.json ./src/assets
+          ls
           echo "***********   BUILD INFO JSON   *******************"
           cat ./build-and-deloy-repo/buildinfo.json
           echo "***********   BUILD INFO JSON   *******************"
