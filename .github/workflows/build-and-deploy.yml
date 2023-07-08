@@ -239,7 +239,7 @@ jobs:
         run: |
           cp ./build-and-deloy-repo/buildinfo.json /usr/share/nginx/html/assets
           echo "***********   BUILD INFO JSON   *******************"
-          cat /usr/share/nginx/html/assets/buildinfo.json
+          cat ./build-and-deloy-repo/buildinfo.json
           echo "***********   BUILD INFO JSON   *******************"
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
