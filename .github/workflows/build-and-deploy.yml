@@ -237,9 +237,9 @@ jobs:
       - name: CopyBuildInfoJsonToSourceRoot
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
-          cp ./build-and-deloy-repo/buildinfo.json .
+          cp ./build-and-deloy-repo/buildinfo.json ./assets
           echo "***********   BUILD INFO JSON   *******************"
-          cat buildinfo.json
+          cat ./assets/buildinfo.json
           echo "***********   BUILD INFO JSON   *******************"
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
