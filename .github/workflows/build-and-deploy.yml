@@ -234,13 +234,19 @@ jobs:
           JSON_BUILDINFO_LAST_COMMIT_URL: ${{steps.GetLastCommitInfo.outputs.commitUrl}}
           JSON_BUILDINFO_LAST_COMMIT_FILES: ${{steps.GetLastCommitInfo.outputs.commitFiles}}
           JSON_BUILDINFO_RELEASE_SQL_SCRIPTS_MODIFIED: ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}}
-      - name: CopyBuildInfoJsonToSourceRoot
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
+      - name: CopyBuildInfoJsonToAssetsFolderForAngularApp
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false && fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true'}}
         run: |
           cp ./build-and-deloy-repo/buildinfo.json ./src/assets
-          ls
           echo "***********   BUILD INFO JSON   *******************"
-          cat ./build-and-deloy-repo/buildinfo.json
+          cat ./src/assets/buildinfo.json
+          echo "***********   BUILD INFO JSON   *******************"
+      - name: CopyBuildInfoJsonToAssetsFolderForBackEndApp
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false && fromJson(steps.EvaluateParams.outputs.result).angularApp == 'false'}}
+        run: |
+          cp ./build-and-deloy-repo/buildinfo.json .
+          echo "***********   BUILD INFO JSON   *******************"
+          cat ./buildinfo.json
           echo "***********   BUILD INFO JSON   *******************"
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
