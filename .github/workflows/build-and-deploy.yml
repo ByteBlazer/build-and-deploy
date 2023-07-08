@@ -51,10 +51,9 @@ jobs:
         with:
           tag_prefix: "v"
           major_pattern: "(MAJOR)"
-          minor: "(MINOR)"
+          minor_pattern: "(MINOR)"
           version_format: "${major}.${minor}.${patch}-prerelease${increment}"
           bump_each_commit: true
-          enable_prerelease_mode: false
       - name: GetAllBranchNames
         id: GetAllBranchNames
         run: |
