@@ -1,6 +1,7 @@
 module.exports = ({
   github,
   context,
+  semanticVersion,
   triggeredBySisterApp,
   triggeredByBranchDeleteEvent,
   humanTriggered,
@@ -197,12 +198,15 @@ module.exports = ({
           "The properties:- triggeredBy and phoneNumberLastFiveDigits must be set"
         );
       }
-      if(!fastForwardServerDays ||  !fastForwardServerDays.startsWith('+') || !fastForwardServerDays.endsWith('d')){
+      if (
+        !fastForwardServerDays ||
+        !fastForwardServerDays.startsWith("+") ||
+        !fastForwardServerDays.endsWith("d")
+      ) {
         throw new Error(
           "The fastForwardServerDays attribute should be present and should be of the format:a plus sign, a number and then the letter-d. Examples: +0d, +5d , +105d, +20d etc..."
         );
       }
-
 
       groupName = triggeredBy + "-" + phoneNumberLastFiveDigits;
       env = envNameForLightWeight;
@@ -316,8 +320,7 @@ module.exports = ({
         githubDispatchApiEndpoint = githubDispatchApiUrlTemplate
           .replace("<APP_NAME_PLACEHOLDER>", sisterApp)
           .replace("<CORP_NAME_PLACEHOLDER>", corp);
-        
-        
+
         const postRequestBody = {
           event_type: "ondemand",
           client_payload: {
@@ -450,6 +453,7 @@ module.exports = ({
   const resultObj = {
     env,
     applicationName,
+    semanticVersion,
     branchRefToBeCheckedOut,
     branchNameToBeCheckedOut,
     namespace,
