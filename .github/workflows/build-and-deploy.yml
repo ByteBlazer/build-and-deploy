@@ -139,7 +139,7 @@ jobs:
           tag_prefix: "v"
           major_pattern: "(MAJOR)"
           minor_pattern: "(MINOR)"
-          version_format: "${major}.${minor}.${patch}-prerelease${increment}"
+          version_format: "${major}.${minor}.${patch}"
           bump_each_commit: true
       # - name: MakeFileCopies
       #   run:  cp kubernetes/file.yaml  kubernetes/copy-of-file.yaml
@@ -221,6 +221,7 @@ jobs:
         env:
           JSON_BUILDINFO_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           JSON_BUILDINFO_BRANCH_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}
+          JSON_BUILDINFO_SEMANTIC_VERSION: ${{fromJson(steps.SemanticVersioning.outputs.version)}}
           JSON_BUILDINFO_BUILD_TIME: ${{fromJson(steps.EvaluateParams.outputs.result).deployTimestamp}}
           JSON_BUILDINFO_LAST_COMMIT_MSG: ${{steps.GetLastCommitInfo.outputs.commitMessage}}
           JSON_BUILDINFO_LAST_COMMIT_DATE: ${{steps.GetLastCommitInfo.outputs.commitDate}}
