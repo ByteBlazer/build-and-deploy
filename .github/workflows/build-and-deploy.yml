@@ -342,24 +342,17 @@ jobs:
           The process ended with a status of : *${{job.status}}*. \n"
           if [ ${{job.status}} == 'success' ]
           then
-            content="$content\n\n  *If this is a front-end-ui-ONLY deployment:*\n\
+            content="$content\n\n  *What to do next:*\n\
             The application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
-            The buildinfo page can be accessed at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}/buildinfo\n\
+            The buildinfo page can be accessed by clicking on the version number text at the bottom right corner of the menu nav bar, while logged in as superadmin\n\
             \n\
-            *If this is a front-end deployment, and a back-end api deployment was also triggered simultaneously:*\n\
-            Please check the status of the back-end build which shows up separately in this Slack channel.\n\
-            \n\
-            *If this is a back-end api deployment:*\n\
-            The application server startup will be attempted now...\n\
             If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n\
-            If this is an existing branch, the server startup should take only a few minutes.\n\
-            The front-end URL will be: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}"
             if [ ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}} == 1 ] && [ "${{fromJson(steps.EvaluateParams.outputs.result).env}}" != "PROD" ]
             then      
-              content="$content\n\nNOTE: This commit involves a change in the db release delta scripts.\n\
-              During server startup, the existing data will be wiped out and the latest data dump from the AWS S3 bucket will get loaded.\n\
-              On top of that, the delta scripts will also be executed.\n\
-              Please wait for a separate notification in this Slack channel ......\n" 
+              content="$content\n\nNOTE: There was a change in the db release delta scripts detected in this commit.\n\
+              So during server startup, the existing data will be wiped out and the latest data dump from the AWS S3 bucket will get loaded to the DB.\n\
+              On top of that, the delta scripts checked in to the branch *${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}* will also get executed.\n\
+              Please wait for a separate notification about the status of the delta script execution......\n" 
             fi
           fi
           content="$content\n*************************  END MESSAGE ********************************\n"
