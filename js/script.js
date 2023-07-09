@@ -8,6 +8,7 @@ module.exports = ({
   triggeredBy,
   phoneNumberLastFiveDigits,
   fastForwardServerDays,
+  deleteAndRebuildDB,
   corp,
   nameOfLightweightNamespace,
   nameOfTestNamespace,
@@ -190,7 +191,7 @@ module.exports = ({
 
     if (humanTriggered == "true") {
       console.log(
-        "This run has been triggered manually by a user. Going to use the code from release branch for deployment."
+        "This run has been triggered manually by a user. Going to use the code from release branch for deployment. The featureBranchName input is going to be ignored."
       );
       if (!triggeredBy || !phoneNumberLastFiveDigits) {
         throw new Error(
@@ -485,6 +486,7 @@ module.exports = ({
     postRequestBodyJSON,
     deleteFlow,
     deployTimestamp,
+    deleteAndRebuildDB,
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));

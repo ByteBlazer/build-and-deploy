@@ -68,7 +68,7 @@ jobs:
           result-encoding: string
           script: |
             const script = require('./build-and-deloy-repo/js/script.js');
-            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerDays:"${{github.event.client_payload.fastForwardServerDays}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
+            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerDays:"${{github.event.client_payload.fastForwardServerDays}}" ,deleteAndRebuildDB:"${{github.event.client_payload.deleteAndRebuildDB}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
       - name: GetLastCommitInfo
         id: GetLastCommitInfo
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
@@ -294,13 +294,19 @@ jobs:
       - name: DeployDatabaseToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
-          #search for pod name that starts with 'loooper-db-sujith-' . If we get a valid result, it means DB pod is there already, so no need to do the hack ritual below
+          #Sometimes the developer might want to redeploy the DB of his own lightweight deployment. The developer might have done something to his lightweight db and messed it up...
+          #He prefres to re-start with test deployed DB, But even if the developer triggers API build, it will not recreate DB as the pod is already there
+          #The only way to recreate his lightweight DB with test data is to somehow delete the DB pod.
+          #If DB is recreated, it will have zero tables, and do during backend app startup, it will take latest DB scripts from S3 and run them, and the delta, and thereby recreate lightweight DB data..
+          deleteAndRebuildDB='${{fromJson(steps.EvaluateParams.outputs.result).deleteAndRebuildDB}}'
+          #before deploying DB, search for pod name that starts with '<app-name>-db-<feature-branch>-'. For e.g. 'lo0oper-db-sujith-' . If we get a valid result, it means DB pod is there already, so no need to do the hack ritual below
           numberOfMatchingDbPods=$(kubectl get pods -n ${{fromJson(steps.EvaluateParams.outputs.result).namespace}} | grep ${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}}- | wc -l  )
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
-          echo "If no matching db pods, we will delete and re-apply, we will delete. Got numberOfMatchingDbPods as $numberOfMatchingDbPods"
-          if [ $numberOfMatchingDbPods == 0 ]
+          echo "If no matching db pods, we will delete and re-apply. Got numberOfMatchingDbPods as $numberOfMatchingDbPods"
+          if [ $numberOfMatchingDbPods == 0 || $deleteAndRebuildDB == 'true' ]
           then
-            #Hack - The DB init scripts was not getting run, so need to delete and re-created. Do this only for first time, else when you delete, you will lose all data
+            #Hack - The DB init scripts was not getting run,not able to figure out why, so need to delete and re-create. Do this only for first time, else when you delete, you will lose all data
+            #When you come next time, the numberOfMatchingDbPods will be non-zero, so it won't enter this hack, and you won't lose data
             sleep 60
             kubectl delete -f build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
             sleep 60
