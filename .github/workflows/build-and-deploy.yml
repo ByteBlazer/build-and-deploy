@@ -285,10 +285,10 @@ jobs:
           echo "Docker Build Final Command:$dockerBuildCommand"
           eval $dockerBuildCommand
           echo ".......docker image built succesfully"
-          #dockerDbBuildCommand="docker build -t byteblazer/mysql -f Dockerfile-Database ."
-          #eval $dockerDbBuildCommand
-          #dockerDbPushCommand="docker push byteblazer/mysql"
-          #eval $dockerDbPushCommand
+          dockerDbBuildCommand="docker build -t byteblazer/mysql -f Dockerfile-Database ."
+          eval $dockerDbBuildCommand
+          dockerDbPushCommand="docker push byteblazer/mysql"
+          eval $dockerDbPushCommand
           echo "Going to push the docker image to docker hub......."
           docker push ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} --quiet
           echo ".......image push to docker hub completed succesfully"
