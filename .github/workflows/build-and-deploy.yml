@@ -344,10 +344,10 @@ jobs:
           if [ ${{job.status}} == 'success' ]
           then
             content="$content\n\n  *What to do next:*\n\
-            The application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
-            The buildinfo page can be accessed by clicking on the version number text at the bottom right corner of the menu nav bar, while logged in as superadmin\n\
+            If both front end and back end have been deployed, the application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
+            The buildinfo page can be accessed from inside the application by clicking on the version number text at the bottom right corner of the menu nav bar, while logged in as superadmin.\n\
             \n\
-            If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n"
+            P.S.: If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n"
             if [ ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}} == 1 ] && [ "${{fromJson(steps.EvaluateParams.outputs.result).env}}" != "PROD" ]
             then      
               content="$content\n\nNOTE: There was a change in the db release delta scripts detected in this commit.\n\
