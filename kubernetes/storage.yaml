@@ -37,7 +37,7 @@ data:
     net_buffer_length=1M
     default_storage_engine=InnoDB
     innodb_buffer_pool_instances=1#Use1instanceper1GBofInnoDBpoolsize
-    innodb_buffer_pool_size=100M
+    innodb_buffer_pool_size=30M#IMPORTANT SETTING
     innodb_file_per_table=1
     innodb_flush_log_at_trx_commit=0
     innodb_flush_method=O_DIRECT
