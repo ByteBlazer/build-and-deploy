@@ -19,7 +19,7 @@ spec:
       containers:
         - name: mysql #TODO
           image: <<YAML_DATABASE_DOCKER_IMAGE_NAME_AND_TAG>>
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "<<YAML_HASH_BASED_DB_PASSWORD>>"
