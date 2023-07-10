@@ -1,5 +1,6 @@
 {
   "host": "<<JSON_BUILDINFO_HOST>>",
+  "applicationName": "<<JSON_BUILDINFO_APPLICATION_NAME>>",
   "branchName": "<<JSON_BUILDINFO_BRANCH_NAME>>",
   "buildVersion": "<<JSON_BUILDINFO_SEMANTIC_VERSION>>",
   "buildTime": "<<JSON_BUILDINFO_BUILD_TIME>>",
