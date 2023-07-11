@@ -68,7 +68,7 @@ jobs:
           result-encoding: string
           script: |
             const script = require('./build-and-deloy-repo/js/script.js');
-            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerDays:"${{github.event.client_payload.fastForwardServerDays}}" ,deleteAndRebuildDB:"${{github.event.client_payload.deleteAndRebuildDB}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
+            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",deleteAndRebuildDB:"${{github.event.client_payload.deleteAndRebuildDB}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
       - name: GetLastCommitInfo
         id: GetLastCommitInfo
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
@@ -191,7 +191,6 @@ jobs:
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_PATH_PATTERN: ${{fromJson(steps.EvaluateParams.outputs.result).pathPattern}}
           YAML_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}}
-          YAML_FAST_FORWARD_NUMBER_OF_DAYS: ${{fromJson(steps.EvaluateParams.outputs.result).fastForwardServerDays}}
       - name: ReplaceTokensInKubernetesDatabaseDeploymentFiles
         uses: cschleiden/replace-tokens@v1.2
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed ==  'true'}}
@@ -210,8 +209,6 @@ jobs:
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_DB_SCHEMA_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).dbSchemaName}}
           YAML_HASH_BASED_DB_PASSWORD: ${{fromJson(steps.EvaluateParams.outputs.result).hashBasedDBPassword}}
-          YAML_DATABASE_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).databaseDockerImageNameAndTag}}
-          YAML_FAST_FORWARD_NUMBER_OF_DAYS: ${{fromJson(steps.EvaluateParams.outputs.result).fastForwardNumOfDays}}
       - name: ReplaceTokensInBuildInfoJsonFile
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         uses: cschleiden/replace-tokens@v1.2
@@ -285,10 +282,6 @@ jobs:
           echo "Docker Build Final Command:$dockerBuildCommand"
           eval $dockerBuildCommand
           echo ".......docker image built succesfully"
-          #dockerDbBuildCommand="docker build -t byteblazer/mysql -f Dockerfile-Database ."
-          #eval $dockerDbBuildCommand
-          #dockerDbPushCommand="docker push byteblazer/mysql"
-          #eval $dockerDbPushCommand
           echo "Going to push the docker image to docker hub......."
           docker push ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}} --quiet
           echo ".......image push to docker hub completed succesfully"

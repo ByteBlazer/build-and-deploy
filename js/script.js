@@ -7,7 +7,6 @@ module.exports = ({
   featureBranchName,
   triggeredBy,
   phoneNumberLastFiveDigits,
-  fastForwardServerDays,
   deleteAndRebuildDB,
   corp,
   nameOfLightweightNamespace,
@@ -76,7 +75,7 @@ module.exports = ({
   let ingressLbName = "NA";
   let hostName = "NA";
   let dockerImageNameAndTag = "NA";
-  let databaseDockerImageNameAndTag = "NA";
+
   let env = "NA";
   let githubDispatchApiEndpoint = "NA";
   let githubBranchesApiEndpoint = "NA";
@@ -96,8 +95,6 @@ module.exports = ({
   const envNameForProduction = "PROD";
   const envNameForTest = "TEST";
   const envNameForLightWeight = "LIGHTWEIGHT";
-
-  databaseDockerImageNameAndTag = corp + "/" + "mysql";
 
   const dockerEnvBaseVarKeyNameForDBHost = "DB_HOST";
   const dockerEnvBaseVarKeyNameForDBUsername = "DB_USERNAME";
@@ -196,15 +193,6 @@ module.exports = ({
       if (!triggeredBy || !phoneNumberLastFiveDigits) {
         throw new Error(
           "The properties:- triggeredBy and phoneNumberLastFiveDigits must be set"
-        );
-      }
-      if (
-        !fastForwardServerDays ||
-        !fastForwardServerDays.startsWith("+") ||
-        !fastForwardServerDays.endsWith("d")
-      ) {
-        throw new Error(
-          "The fastForwardServerDays attribute should be present and should be of the format:a plus sign, a number and then the letter-d. Examples: +0d, +5d , +105d, +20d etc..."
         );
       }
 
@@ -331,7 +319,6 @@ module.exports = ({
             humanTriggered: false,
             triggeredBy: "",
             phoneNumberLastFiveDigits: "",
-            fastForwardServerDays: "+0d",
           },
         };
         postRequestBodyJSON = JSON.stringify(postRequestBody);
@@ -472,8 +459,6 @@ module.exports = ({
     angularApp,
     backendApiContextPath,
     dockerImageNameAndTag,
-    databaseDockerImageNameAndTag,
-    fastForwardServerDays,
     dbSchemaName,
     hashBasedDBPassword,
     buildArgsCommandLineArgsForDockerBuild,
