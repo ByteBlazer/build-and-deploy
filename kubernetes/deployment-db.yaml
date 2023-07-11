@@ -16,12 +16,12 @@ spec:
       labels:
         app: <<YAML_SERVICE_NAME>>
     spec:
-      limits:
-        - default:
-            cpu: "1"
-            memory: "500Mi"
       containers:
         - name: mysql #TODO
+          resources:
+            requests:
+              cpu: 1
+              memory: 600Mi
           image: mysql:8.0.33-debian
           imagePullPolicy: IfNotPresent
           env:
