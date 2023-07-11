@@ -21,7 +21,7 @@ spec:
           resources:
             requests:
               cpu: 0.5
-              memory: 100Mi
+              memory: 10Mi
           image: mysql:8.0.33-debian
           imagePullPolicy: IfNotPresent
           env:
