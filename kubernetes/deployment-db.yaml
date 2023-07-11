@@ -20,7 +20,7 @@ spec:
         - name: mysql #TODO
           resources:
             requests:
-              cpu: 1
+              cpu: 0.5
               memory: 600Mi
           image: mysql:8.0.33-debian
           imagePullPolicy: IfNotPresent
