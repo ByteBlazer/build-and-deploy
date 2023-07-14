@@ -7,7 +7,7 @@ module.exports = ({
   featureBranchName,
   triggeredBy,
   phoneNumberLastFiveDigits,
-  fastForwardServerDays,
+  deleteAndRebuildDB,
   corp,
   nameOfLightweightNamespace,
   nameOfTestNamespace,
@@ -75,7 +75,7 @@ module.exports = ({
   let ingressLbName = "NA";
   let hostName = "NA";
   let dockerImageNameAndTag = "NA";
-  let databaseDockerImageNameAndTag = "NA";
+
   let env = "NA";
   let githubDispatchApiEndpoint = "NA";
   let githubBranchesApiEndpoint = "NA";
@@ -95,8 +95,6 @@ module.exports = ({
   const envNameForProduction = "PROD";
   const envNameForTest = "TEST";
   const envNameForLightWeight = "LIGHTWEIGHT";
-
-  databaseDockerImageNameAndTag = corp + "/" + "mysql";
 
   const dockerEnvBaseVarKeyNameForDBHost = "DB_HOST";
   const dockerEnvBaseVarKeyNameForDBUsername = "DB_USERNAME";
@@ -190,19 +188,13 @@ module.exports = ({
 
     if (humanTriggered == "true") {
       console.log(
-        "This run has been triggered manually by a user. Going to use the code from release branch for deployment."
+        "This run has been triggered manually by a user. Going to use the code from release branch for deployment. The featureBranchName input is going to be ignored."
       );
       if (!triggeredBy || !phoneNumberLastFiveDigits) {
         throw new Error(
           "The properties:- triggeredBy and phoneNumberLastFiveDigits must be set"
         );
       }
-      if(!fastForwardServerDays ||  !fastForwardServerDays.startsWith('+') || !fastForwardServerDays.endsWith('d')){
-        throw new Error(
-          "The fastForwardServerDays attribute should be present and should be of the format:a plus sign, a number and then the letter-d. Examples: +0d, +5d , +105d, +20d etc..."
-        );
-      }
-
 
       groupName = triggeredBy + "-" + phoneNumberLastFiveDigits;
       env = envNameForLightWeight;
@@ -316,8 +308,7 @@ module.exports = ({
         githubDispatchApiEndpoint = githubDispatchApiUrlTemplate
           .replace("<APP_NAME_PLACEHOLDER>", sisterApp)
           .replace("<CORP_NAME_PLACEHOLDER>", corp);
-        
-        
+
         const postRequestBody = {
           event_type: "ondemand",
           client_payload: {
@@ -328,7 +319,6 @@ module.exports = ({
             humanTriggered: false,
             triggeredBy: "",
             phoneNumberLastFiveDigits: "",
-            fastForwardServerDays: "+0d",
           },
         };
         postRequestBodyJSON = JSON.stringify(postRequestBody);
@@ -469,8 +459,6 @@ module.exports = ({
     angularApp,
     backendApiContextPath,
     dockerImageNameAndTag,
-    databaseDockerImageNameAndTag,
-    fastForwardServerDays,
     dbSchemaName,
     hashBasedDBPassword,
     buildArgsCommandLineArgsForDockerBuild,
@@ -483,6 +471,7 @@ module.exports = ({
     postRequestBodyJSON,
     deleteFlow,
     deployTimestamp,
+    deleteAndRebuildDB,
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));

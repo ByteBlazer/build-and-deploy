@@ -51,14 +51,14 @@ jobs:
           gitHubBranchesUrl="$(echo '${{github.event.repository.branches_url}}'|sed 's/{\/branch}//g')";
           curl --location --request GET $gitHubBranchesUrl --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -o branches.json
           branches="$(cat branches.json | jq -r '.[].name'|awk '{print $1}' ORS=",")"
-          echo "::set-output name=branches::$branches"
+          echo "branches=$branches" >> $GITHUB_OUTPUT
       - name: view the secrets  context
         shell: bash
         id: ViewSecretKeys
         run: |
           echo "$SECRETS_CONTEXT">secrets.json
           keyValuePairsJsonString="$(cat secrets.json | awk '{print $0}' ORS="")"
-          echo "::set-output name=keyValuePairsJsonString::$keyValuePairsJsonString"
+          echo "keyValuePairsJsonString=$keyValuePairsJsonString" >> $GITHUB_OUTPUT
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
       - name: EvaluateParams
@@ -68,7 +68,7 @@ jobs:
           result-encoding: string
           script: |
             const script = require('./build-and-deloy-repo/js/script.js');
-            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",fastForwardServerDays:"${{github.event.client_payload.fastForwardServerDays}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
+            return script({ github, context, triggeredBySisterApp:"${{github.event.client_payload.triggeredBySisterApp}}",triggeredByBranchDeleteEvent:"${{github.event.client_payload.triggeredByBranchDeleteEvent}}",humanTriggered:"${{github.event.client_payload.humanTriggered}}",featureBranchName:"${{github.event.client_payload.featureBranchName}}",triggeredBy:"${{github.event.client_payload.triggeredBy}}",phoneNumberLastFiveDigits:"${{github.event.client_payload.phoneNumberLastFiveDigits}}",deleteAndRebuildDB:"${{github.event.client_payload.deleteAndRebuildDB}}" ,corp:"${{ secrets.CORP }}",nameOfLightweightNamespace:"${{secrets.K8S_LIGHTWEIGHT_NAMESPACE}}",nameOfTestNamespace:"${{ secrets.K8S_TEST_NAMESPACE}}",nameOfProductionNamespace:"${{ secrets.K8S_PRODUCTION_NAMESPACE}}", branches:"${{steps.GetAllBranchNames.outputs.branches}}",keyValuePairsJsonString:'${{steps.ViewSecretKeys.outputs.keyValuePairsJsonString}}',targetRootDomain:'${{inputs.targetRootDomain}}',applicationName:'${{inputs.applicationName}}',containerPort:'${{inputs.containerPort}}',pathPattern:'${{inputs.pathPattern}}',angularApp:'${{inputs.angularApp}}',backendApiContextPath:'${{inputs.backendApiContextPath}}',sisterApp:'${{inputs.sisterApp}}',numberOfApplicationReplicas:'${{inputs.numberOfApplicationReplicas}}',needsDatabase:'${{inputs.needsDatabase}}'});
       - name: GetLastCommitInfo
         id: GetLastCommitInfo
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
@@ -77,6 +77,7 @@ jobs:
           lastCommitUrl="$(cat appBranches.json | jq -r '.[] | select(.name=="${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}") | .commit.url')"  
           curl --location --request GET $lastCommitUrl --header 'Authorization: token ${{ secrets.PERSONAL_GITHUB_TOKEN }}' -o commitInfo.json
           commitMessage="$(cat commitInfo.json|jq -r .commit.message)"
+          commitMessageWithLineBreaksRemoved=$(echo $commitMessage | tr '\n' ' ')
           commitDate="$(cat commitInfo.json|jq -r .commit.committer.date)"
           committerName="$(cat commitInfo.json|jq -r .commit.committer.name)"
           committerLogin="$(cat commitInfo.json|jq -r .committer.login)"
@@ -86,16 +87,16 @@ jobs:
           commitUrl="$(cat commitInfo.json|jq -r .html_url)"
           commitFiles="$(cat commitInfo.json|jq -r .files[].filename | awk '{print $1}' ORS=',')"
           releaseDbSqlScriptsModified="$(cat commitInfo.json|jq -r .files[].filename | grep release-db-scripts.sql | wc -l)"
-          echo "::set-output name=commitMessage::$commitMessage"
-          echo "::set-output name=commitDate::$commitDate"
-          echo "::set-output name=committerName::$committerName"
-          echo "::set-output name=committerLogin::$committerLogin"
-          echo "::set-output name=originalCommitDate::$originalCommitDate"
-          echo "::set-output name=originalCommitterName::$originalCommitterName"
-          echo "::set-output name=originalCommitterLogin::$originalCommitterLogin"
-          echo "::set-output name=commitUrl::$commitUrl"
-          echo "::set-output name=commitFiles::$commitFiles"
-          echo "::set-output name=releaseDbSqlScriptsModified::$releaseDbSqlScriptsModified"
+          echo "commitMessage=$commitMessageWithLineBreaksRemoved" >> $GITHUB_OUTPUT
+          echo "commitDate=$commitDate" >> $GITHUB_OUTPUT
+          echo "committerName=$committerName" >> $GITHUB_OUTPUT
+          echo "committerLogin=$committerLogin" >> $GITHUB_OUTPUT
+          echo "originalCommitDate=$originalCommitDate" >> $GITHUB_OUTPUT
+          echo "originalCommitterName=$originalCommitterName" >> $GITHUB_OUTPUT
+          echo "originalCommitterLogin=$originalCommitterLogin" >> $GITHUB_OUTPUT
+          echo "commitUrl=$commitUrl" >> $GITHUB_OUTPUT
+          echo "commitFiles=$commitFiles" >> $GITHUB_OUTPUT
+          echo "releaseDbSqlScriptsModified=$releaseDbSqlScriptsModified" >> $GITHUB_OUTPUT
       - name: SendBeginningSlackNotification
         id: SendBeginningSlackNotification
         if: ${{always() && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
@@ -130,7 +131,17 @@ jobs:
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           ref: ${{fromJson(steps.EvaluateParams.outputs.result).branchRefToBeCheckedOut}}
+      - name: SemanticVersioning
+        uses: paulhatch/semantic-version@v5.0.2
+        id: SemanticVersioning
+        with:
+          tag_prefix: "v"
+          major_pattern: "(MAJOR)"
+          minor_pattern: "(MINOR)"
+          version_format: "${major}.${minor}.${patch}"
+          bump_each_commit: true
       # - name: MakeFileCopies
       #   run:  cp kubernetes/file.yaml  kubernetes/copy-of-file.yaml
       - name: CodeCheckout
@@ -140,7 +151,7 @@ jobs:
           path: "./build-and-deloy-repo"
       - name: ReplaceTokensInAngularEnvironmentFiles
         if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
-        uses: cschleiden/replace-tokens@v1
+        uses: cschleiden/replace-tokens@v1.2
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
@@ -163,7 +174,7 @@ jobs:
           echo '....configuration of kubectl command completed'
           kubectl get pods
       - name: ReplaceTokensInKubernetesDeploymentFiles
-        uses: cschleiden/replace-tokens@v1
+        uses: cschleiden/replace-tokens@v1.2
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
@@ -180,9 +191,8 @@ jobs:
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_PATH_PATTERN: ${{fromJson(steps.EvaluateParams.outputs.result).pathPattern}}
           YAML_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).dockerImageNameAndTag}}
-          YAML_FAST_FORWARD_NUMBER_OF_DAYS: ${{fromJson(steps.EvaluateParams.outputs.result).fastForwardServerDays}}
       - name: ReplaceTokensInKubernetesDatabaseDeploymentFiles
-        uses: cschleiden/replace-tokens@v1
+        uses: cschleiden/replace-tokens@v1.2
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed ==  'true'}}
         with:
           tokenPrefix: "<<"
@@ -199,18 +209,18 @@ jobs:
           YAML_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           YAML_DB_SCHEMA_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).dbSchemaName}}
           YAML_HASH_BASED_DB_PASSWORD: ${{fromJson(steps.EvaluateParams.outputs.result).hashBasedDBPassword}}
-          YAML_DATABASE_DOCKER_IMAGE_NAME_AND_TAG: ${{fromJson(steps.EvaluateParams.outputs.result).databaseDockerImageNameAndTag}}
-          YAML_FAST_FORWARD_NUMBER_OF_DAYS: ${{fromJson(steps.EvaluateParams.outputs.result).fastForwardNumOfDays}}
       - name: ReplaceTokensInBuildInfoJsonFile
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
-        uses: cschleiden/replace-tokens@v1
+        uses: cschleiden/replace-tokens@v1.2
         with:
           tokenPrefix: "<<"
           tokenSuffix: ">>"
           files: '["./build-and-deloy-repo/buildinfo.json"]'
         env:
           JSON_BUILDINFO_HOST: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
+          JSON_BUILDINFO_APPLICATION_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).applicationName}}
           JSON_BUILDINFO_BRANCH_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}
+          JSON_BUILDINFO_SEMANTIC_VERSION: ${{steps.SemanticVersioning.outputs.version}}
           JSON_BUILDINFO_BUILD_TIME: ${{fromJson(steps.EvaluateParams.outputs.result).deployTimestamp}}
           JSON_BUILDINFO_LAST_COMMIT_MSG: ${{steps.GetLastCommitInfo.outputs.commitMessage}}
           JSON_BUILDINFO_LAST_COMMIT_DATE: ${{steps.GetLastCommitInfo.outputs.commitDate}}
@@ -222,12 +232,19 @@ jobs:
           JSON_BUILDINFO_LAST_COMMIT_URL: ${{steps.GetLastCommitInfo.outputs.commitUrl}}
           JSON_BUILDINFO_LAST_COMMIT_FILES: ${{steps.GetLastCommitInfo.outputs.commitFiles}}
           JSON_BUILDINFO_RELEASE_SQL_SCRIPTS_MODIFIED: ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}}
-      - name: CopyBuildInfoJsonToSourceRoot
-        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
+      - name: CopyBuildInfoJsonToAssetsFolderForAngularApp
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false && fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true'}}
+        run: |
+          cp ./build-and-deloy-repo/buildinfo.json ./src/assets
+          echo "***********   BUILD INFO JSON   *******************"
+          cat ./src/assets/buildinfo.json
+          echo "***********   BUILD INFO JSON   *******************"
+      - name: CopyBuildInfoJsonToAssetsFolderForBackEndApp
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false && fromJson(steps.EvaluateParams.outputs.result).angularApp == 'false'}}
         run: |
           cp ./build-and-deloy-repo/buildinfo.json .
           echo "***********   BUILD INFO JSON   *******************"
-          cat buildinfo.json
+          cat ./buildinfo.json
           echo "***********   BUILD INFO JSON   *******************"
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
@@ -275,7 +292,25 @@ jobs:
       - name: DeployDatabaseToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
+          #Sometimes the developer might want to redeploy the DB of his own lightweight deployment. The developer might have done something to his lightweight db and messed it up...
+          #He prefres to re-start with test deployed DB, But even if the developer triggers API build, it will not recreate DB as the pod is already there
+          #The only way to recreate his lightweight DB with test data is to somehow delete the DB pod.
+          #If DB is recreated, it will have zero tables, and do during backend app startup, it will take latest DB scripts from S3 and run them, and the delta, and thereby recreate lightweight DB data..
+          deleteAndRebuildDB='${{fromJson(steps.EvaluateParams.outputs.result).deleteAndRebuildDB}}'
+          #before deploying DB, search for pod name that starts with '<app-name>-db-<feature-branch>-'. For e.g. 'lo0oper-db-sujith-' . If we get a valid result, it means DB pod is there already, so no need to do the hack ritual below
+          numberOfMatchingDbPods=$(kubectl get pods -n ${{fromJson(steps.EvaluateParams.outputs.result).namespace}} | grep ${{fromJson(steps.EvaluateParams.outputs.result).serviceNameForDatabase}}- | wc -l  )
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/storage.yaml,build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
+          echo "If no matching db pods, we will delete and re-apply. Got numberOfMatchingDbPods as $numberOfMatchingDbPods"
+          if [ $numberOfMatchingDbPods == 0 || $deleteAndRebuildDB == 'true' ]
+          then
+            #Hack - The DB init scripts was not getting run,not able to figure out why, so need to delete and re-create. Do this only for first time, else when you delete, you will lose all data
+            #When you come next time, the numberOfMatchingDbPods will be non-zero, so it won't enter this hack, and you won't lose data
+            #commenting below 3 lines which are the hack for now...
+            #sleep 60
+            #kubectl delete -f build-and-deloy-repo/kubernetes/service-db.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/pvc.yaml
+            #sleep 60
+            kubectl apply -f build-and-deloy-repo/kubernetes/pvc.yaml,build-and-deloy-repo/kubernetes/deployment-db.yaml,build-and-deloy-repo/kubernetes/service-db.yaml
+          fi
       - name: DeleteApplicationFromKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == true}}
         run: |
@@ -306,24 +341,17 @@ jobs:
           The process ended with a status of : *${{job.status}}*. \n"
           if [ ${{job.status}} == 'success' ]
           then
-            content="$content\n\n  *If this is a front-end-ui-ONLY deployment:*\n\
-            The application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
-            The buildinfo page can be accessed at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}/buildinfo\n\
+            content="$content\n\n  *What to do next:*\n\
+            If both front end and back end have been deployed, the application should be up by now at: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}\n\
+            The buildinfo page can be accessed from inside the application by clicking on the version number text at the bottom right corner of the menu nav bar, while logged in as superadmin.\n\
             \n\
-            *If this is a front-end deployment, and a back-end api deployment was also triggered simultaneously:*\n\
-            Please check the status of the back-end build which shows up separately in this Slack channel.\n\
-            \n\
-            *If this is a back-end api deployment:*\n\
-            The application server startup will be attempted now...\n\
-            If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n\
-            If this is an existing branch, the server startup should take only a few minutes.\n\
-            The front-end URL will be: https://${{fromJson(steps.EvaluateParams.outputs.result).hostName}}"
+            P.S.: If this build was triggered from a freshly cut feature branch, the server startup could take upto 1 hour because of delays in DNS propagation.\n"
             if [ ${{steps.GetLastCommitInfo.outputs.releaseDbSqlScriptsModified}} == 1 ] && [ "${{fromJson(steps.EvaluateParams.outputs.result).env}}" != "PROD" ]
             then      
-              content="$content\n\nNOTE: This commit involves a change in the db release delta scripts.\n\
-              During server startup, the existing data will be wiped out and the latest data dump from the AWS S3 bucket will get loaded.\n\
-              On top of that, the delta scripts will also be executed.\n\
-              Please wait for a separate notification in this Slack channel ......\n" 
+              content="$content\n\nNOTE: There was a change in the db release delta scripts detected in this commit.\n\
+              So during server startup, the existing data will be wiped out and the latest data dump from the AWS S3 bucket will get loaded to the DB.\n\
+              On top of that, the delta scripts checked in to the branch *${{fromJson(steps.EvaluateParams.outputs.result).branchNameToBeCheckedOut}}* will also get executed.\n\
+              Please wait for a separate notification about the status of the delta script execution......\n" 
             fi
           fi
           content="$content\n*************************  END MESSAGE ********************************\n"
