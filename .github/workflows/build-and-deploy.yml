@@ -161,7 +161,16 @@ jobs:
           BACKEND_APP_HOST_NAME: ${{fromJson(steps.EvaluateParams.outputs.result).hostName}}
           BACKEND_APP_BASE_CONTEXT: ${{fromJson(steps.EvaluateParams.outputs.result).backendApiContextPath}}
           APP_ENV: ${{fromJson(steps.EvaluateParams.outputs.result).env}}
-      - name: ReplaceTokensInAngularWebManifestFiles
+      - name: ReplaceTokensInAngularIndexHtmlFile
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
+        uses: cschleiden/replace-tokens@v1.2
+        with:
+          tokenPrefix: "%%"
+          tokenSuffix: "%%"
+          files: '["./src/index.html"]'
+        env:
+          ENV_PREFIX: ${{fromJson(steps.EvaluateParams.outputs.result).prefixForMobileAppName}}
+      - name: ReplaceTokensInAngularWebManifestFile
         if: ${{fromJson(steps.EvaluateParams.outputs.result).angularApp == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         uses: cschleiden/replace-tokens@v1.2
         with:
