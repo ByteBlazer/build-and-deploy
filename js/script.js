@@ -437,6 +437,8 @@ module.exports = ({
     .replace("<APP_NAME_PLACEHOLDER>", applicationName)
     .replace("<CORP_NAME_PLACEHOLDER>", corp);
 
+  const prefixForMobileAppName = env == envNameForProduction ? "" : env + " - ";
+
   const resultObj = {
     env,
     applicationName,
@@ -472,6 +474,7 @@ module.exports = ({
     deleteFlow,
     deployTimestamp,
     deleteAndRebuildDB,
+    prefixForMobileAppName,
   };
 
   console.log("Result Object:" + JSON.stringify(resultObj));
