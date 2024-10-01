@@ -7,7 +7,6 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/load-balancer-name: <<YAML_INGRESS_LB_NAME>> #You will be able to see a loadbalancer of this name getting created in AWS Console
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/ip-address-type: dualstack
     ## SSL Settings
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     # SSL Redirect Setting
