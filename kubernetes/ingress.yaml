@@ -7,15 +7,16 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/load-balancer-name: <<YAML_INGRESS_LB_NAME>> #You will be able to see a loadbalancer of this name getting created in AWS Console
     alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ip-address-type: ipv4
     ## SSL Settings
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     # SSL Redirect Setting
-    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
     # Ingress Groups
     alb.ingress.kubernetes.io/group.name: <<YAML_NAMESPACE>>
-    alb.ingress.kubernetes.io/group.order: '<<YAML_NUMERIC_HASH_OF_HOST>>'
-    # Health Check Settings 
-    #alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
+    alb.ingress.kubernetes.io/group.order: "<<YAML_NUMERIC_HASH_OF_HOST>>"
+    # Health Check Settings
+    #alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
     #alb.ingress.kubernetes.io/healthcheck-port: traffic-port
     #alb.ingress.kubernetes.io/healthcheck-path: /health-check
     #alb.ingress.kubernetes.io/healthcheck-interval-seconds: '15'
@@ -26,14 +27,15 @@ metadata:
 spec:
   ingressClassName: my-aws-ingress-class # What we used in the IngressClass yaml
   rules:
-  - host: <<YAML_HOST>>
-    http:
-      paths: 
-      - path: <<YAML_PATH_PATTERN>>
-        pathType: Prefix #You can use 'Exact' as well, but we use 'Prefix' mostly
-        backend:
-          service:
-            name: <<YAML_SERVICE_NAME>>
-            port:
-              number: <<YAML_SERVICE_PORT>>
+    - host: <<YAML_HOST>>
+      http:
+        paths:
+          - path: <<YAML_PATH_PATTERN>>
+            pathType: Prefix #You can use 'Exact' as well, but we use 'Prefix' mostly
+            backend:
+              service:
+                name: <<YAML_SERVICE_NAME>>
+                port:
+                  number: <<YAML_SERVICE_PORT>>
 ---
+
