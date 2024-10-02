@@ -36,5 +36,15 @@ spec:
                 name: <<YAML_SERVICE_NAME>>
                 port:
                   number: <<YAML_SERVICE_PORT>>
+    - host: www.<<YAML_HOST>>
+      http:
+        paths:
+          - path: <<YAML_PATH_PATTERN>>
+            pathType: Prefix #You can use 'Exact' as well, but we use 'Prefix' mostly
+            backend:
+              service:
+                name: <<YAML_SERVICE_NAME>>
+                port:
+                  number: <<YAML_SERVICE_PORT>>
 ---
 
