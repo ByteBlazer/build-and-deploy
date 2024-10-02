@@ -24,7 +24,7 @@ metadata:
     #alb.ingress.kubernetes.io/healthy-threshold-count: '2'
     #alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'
 spec:
-  ingressClassName: my-aws-ingress-class # What we used in the IngressClass yaml
+  ingressClassName: my-aws-ingress-class # What we used in the IngressClass yaml. We have two rules below, one for saleslooperapp.com, one for www.saleslooperapp.com; note that it doesn't work for www.sujith.saleslooperapp.com or any lightweight, because of our SSL cert setup (no double wildcards). It works for www.test.saleslooperapp.com and www.saleslooperapp.com
   rules:
     - host: <<YAML_HOST>>
       http:
