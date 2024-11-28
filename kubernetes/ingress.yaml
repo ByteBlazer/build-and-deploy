@@ -24,7 +24,7 @@ metadata:
     #alb.ingress.kubernetes.io/healthy-threshold-count: '2'
     #alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'
 spec:
-  ingressClassName: my-aws-ingress-class # What we used in the IngressClass yaml. We have two rules below, one for saleslooperapp.com, one for www.saleslooperapp.com; note that it doesn't work for www.sujith.saleslooperapp.com or any lightweight, because of our SSL cert setup (no double wildcards). It works for www.test.saleslooperapp.com and www.saleslooperapp.com
+  ingressClassName: my-aws-ingress-class # What we used in the IngressClass yaml. We can have two rules below, one for saleslooperapp.com, one for www.saleslooperapp.com; note that it doesn't work for www.sujith.saleslooperapp.com or any lightweight, because of our SSL cert setup (no double wildcards). It works for www.test.saleslooperapp.com and www.saleslooperapp.com. So removing for now , else lightweight builds will fail. If you want to try it out, just copy paste the host section and replace only this... host: www.<<YAML_HOST>> instead of  host: <<YAML_HOST>> for the second section
   rules:
     - host: <<YAML_HOST>>
       http:
@@ -36,15 +36,6 @@ spec:
                 name: <<YAML_SERVICE_NAME>>
                 port:
                   number: <<YAML_SERVICE_PORT>>
-    - host: www.<<YAML_HOST>>
-      http:
-        paths:
-          - path: <<YAML_PATH_PATTERN>>
-            pathType: Prefix #You can use 'Exact' as well, but we use 'Prefix' mostly
-            backend:
-              service:
-                name: <<YAML_SERVICE_NAME>>
-                port:
-                  number: <<YAML_SERVICE_PORT>>
+
 ---
 
