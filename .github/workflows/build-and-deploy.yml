@@ -308,7 +308,7 @@ jobs:
         run: |
           kubectl delete secret dockerhub-secret --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}} --ignore-not-found
           kubectl delete secret dockerhub-secret --ignore-not-found
-          kubectl create secret docker-registry dockerhub-secret --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}} --docker-server=https://registry-1.docker.io --docker-username=${{ secrets.DOCKER_LOGIN_USER}} --docker-password=${{ secrets.DOCKER_LOGIN_PASSWORD}}
+          kubectl create secret docker-registry dockerhub-secret --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}} --docker-server=https://registry-1.docker.io --docker-username=${{ secrets.DOCKER_LOGIN_USER}} --docker-password='${{ secrets.DOCKER_LOGIN_PASSWORD}}'
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeployDatabaseToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
