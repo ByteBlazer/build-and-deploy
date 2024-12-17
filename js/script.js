@@ -439,6 +439,8 @@ module.exports = ({
 
   const prefixForMobileAppName = env == envNameForProduction ? "" : env + " - ";
 
+  console.log("namespace:" + namespace.substring(0, 12));
+
   const resultObj = {
     env,
     applicationName,
