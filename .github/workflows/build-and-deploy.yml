@@ -306,7 +306,7 @@ jobs:
       - name: DeployApplicationToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
-          kubectl create secret docker-registry dockerhub-secret --docker-server=https://registry-1.docker.io --docker-username=${{ secrets.DOCKER_LOGIN_USER}} --docker-password=${{ secrets.DOCKER_LOGIN_PASSWORD}} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret docker-registry dockerhub-secret --docker-server=https://registry-1.docker.io --docker-username=${{ secrets.DOCKER_LOGIN_USER}} --docker-password=${{ secrets.DOCKER_LOGIN_PASSWORD}} --dry-run=client -o yaml | kubectl replace --force -f -
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeployDatabaseToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
