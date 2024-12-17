@@ -306,7 +306,8 @@ jobs:
       - name: DeployApplicationToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
-          kubectl delete secret dockerhub-secret --ignore-not-found --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
+          kubectl delete secret dockerhub-secret --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}} --ignore-not-found
+          kubectl delete secret dockerhub-secret --ignore-not-found
           kubectl create secret docker-registry dockerhub-secret --docker-server=https://registry-1.docker.io --docker-username=${{ secrets.DOCKER_LOGIN_USER}} --docker-password=${{ secrets.DOCKER_LOGIN_PASSWORD}} --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}}
           kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeployDatabaseToKubernetes
