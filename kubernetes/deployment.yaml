@@ -16,8 +16,6 @@ spec:
       labels:
         app: <<YAML_SERVICE_NAME>>
     spec:
-      imagePullSecrets:
-        - name: dockerhub-secret
       containers:
         - name: <<YAML_CONTAINER_NAME>>
           image: <<YAML_DOCKER_IMAGE_NAME_AND_TAG>>
@@ -42,5 +40,7 @@ spec:
             initialDelaySeconds: 3600
             periodSeconds: 60
             failureThreshold: 15
+      imagePullSecrets:
+        - name: dockerhub-secret
 ---
 
