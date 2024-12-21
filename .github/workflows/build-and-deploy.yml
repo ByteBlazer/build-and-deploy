@@ -309,8 +309,9 @@ jobs:
           kubectl delete secret dockerhub-secret --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}} --ignore-not-found
           kubectl delete secret dockerhub-secret --ignore-not-found
           echo '{"auths":{"https://index.docker.io/v1/":{"username":"${{ secrets.DOCKER_LOGIN_USER }}","password":"${{ secrets.DOCKER_LOGIN_PASSWORD }}","auth":"'$(echo -n "${{ secrets.DOCKER_LOGIN_USER }}:${{ secrets.DOCKER_LOGIN_PASSWORD }}" | base64)'"}}}' > .dockerconfigjson
+          kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml
           kubectl create secret generic dockerhub-secret --namespace=${{fromJson(steps.EvaluateParams.outputs.result).namespace}} --type=kubernetes.io/dockerconfigjson --from-file=.dockerconfigjson
-          kubectl apply -f build-and-deloy-repo/kubernetes/namespace.yaml,build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
+          kubectl apply -f build-and-deloy-repo/kubernetes/deployment.yaml,build-and-deloy-repo/kubernetes/service.yaml,build-and-deloy-repo/kubernetes/ingress.yaml
       - name: DeployDatabaseToKubernetes
         if: ${{fromJson(steps.EvaluateParams.outputs.result).dbPodNeedsToBeDeployed == 'true' && fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false}}
         run: |
