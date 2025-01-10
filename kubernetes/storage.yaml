@@ -27,7 +27,7 @@ data:
   default_auth: |
     [mysqld]
     default_authentication_plugin=mysql_native_password
-    tmp_table_size=256M
-    max_heap_table_size=256M
+    tmp_table_size=512M
+    max_heap_table_size=512M
 ---
 
