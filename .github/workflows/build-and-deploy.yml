@@ -264,6 +264,13 @@ jobs:
           echo "***********   BUILD INFO JSON   *******************"
           cat ./buildinfo.json
           echo "***********   BUILD INFO JSON   *******************"
+      - name: CreateGCPServiceAccountJSONFileForGmailSendingInBackEndApp
+        if: ${{fromJson(steps.EvaluateParams.outputs.result).deleteFlow == false && fromJson(steps.EvaluateParams.outputs.result).angularApp == 'false'}}
+        run: |
+          echo "${{ secrets.EMAIL_SENDER_CREDS }}" | base64 --decode > ./gcp-svc-account.json
+          echo "***********   DECODED JSON FILE   *******************"
+          cat ./gcp-svc-account.json
+          echo "***********   DECODED JSON FILE   *******************"
       - name: DEBUG-ViewReplacedK8sYaml
         run: |
           echo "\n**************************************************************************\n"
