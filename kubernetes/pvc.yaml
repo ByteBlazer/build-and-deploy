@@ -4,11 +4,12 @@ kind: PersistentVolumeClaim
 metadata:
   name: ebs-mysql-pv-claim-<<YAML_NUMERIC_HASH_OF_HOST>>
   namespace: <<YAML_NAMESPACE>>
-spec: 
+spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: ebs-sc #The name we have for our StorageClass
-  resources: 
+  resources:
     requests:
-      storage: 1Gi #This is the minimum as per EBS policy
+      storage: 5Gi #This is the minimum as per EBS policy
 ---
+
