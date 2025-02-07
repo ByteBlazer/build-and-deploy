@@ -30,16 +30,18 @@ spec:
                 - curl 'https://<<YAML_HOST>>/api/healthcheck/status?probe=readiness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK || curl 'http://localhost:<<YAML_CONTAINER_PORT>>/api/healthcheck/status?probe=readiness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK
             initialDelaySeconds: 10
             periodSeconds: 10
-            failureThreshold: 1
+            failureThreshold: 2
+            timeoutSeconds: 5
           livenessProbe:
             exec:
               command:
                 - /bin/sh
                 - -c
                 - curl 'https://<<YAML_HOST>>/api/healthcheck/status?probe=liveness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK || curl 'http://localhost:<<YAML_CONTAINER_PORT>>/api/healthcheck/status?probe=liveness&application=<<YAML_SERVICE_NAME>>'|grep STATUS-OK
-            initialDelaySeconds: 3600
+            initialDelaySeconds: 120
             periodSeconds: 60
             failureThreshold: 15
+            timeoutSeconds: 5
       imagePullSecrets:
         - name: dockerhub-secret
 ---
