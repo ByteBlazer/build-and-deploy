@@ -14,8 +14,8 @@ metadata:
     # Ingress Groups
     alb.ingress.kubernetes.io/group.name: <<YAML_NAMESPACE>>
     alb.ingress.kubernetes.io/group.order: "<<YAML_NUMERIC_HASH_OF_HOST>>"
-    # We should make it sticky so that websockets work
-    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=86400
+    # We should make it sticky so that websockets work. If we are using redis/google pub-sub, we dont need to enforce sticky
+    # alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=86400
 
     # Health Check Settings
     #alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
